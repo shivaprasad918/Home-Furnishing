@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .container h1 {
+            color: #4CAF50;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons a {
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .buttons a:hover {
+            background-color: #45a049;
+        }
+        .buttons .continue {
+            background-color: #008CBA;
+        }
+        .buttons .continue:hover {
+            background-color: #007bb5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Placed Successfully!</h1>
+        <p>Thank you for your order. Your order has been placed successfully.</p>
+        <div class="buttons">
+            <!-- Use JavaScript to dynamically set the href -->
+            <button id="viewOrderBtn">View Order</button>
+            <a href="/allproducts" class="continue">Continue Shopping</a>
+        </div>
+    </div>
+
+
+    <style>
+        .buttons button{
+            width: 200px;
+            height: 38px;
+            background-color: green;
+            color: white;
+            border-radius: 4px;
+            border: none;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewOrderBtn = document.getElementById('viewOrderBtn');
+            const orderId = '<%= orderId %>'; // Embed the order ID in the script
+            viewOrderBtn.addEventListener('click', function() {
+                window.location.href = `/orderDetailed/${orderId}`;
+            });
+        });
+    </script>
+</body>
+</html>

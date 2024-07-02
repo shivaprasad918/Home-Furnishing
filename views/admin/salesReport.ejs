@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Corona Admin</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="assets/images/favicon.png" />
+</head>
+
+<body>
+    <div class="container-scroller">
+        <!-- partial:../../partials/_sidebar.html -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+                <a class="sidebar-brand brand-logo" href="index.html"><img src="assets/images/logo.svg"
+                        alt="logo" /></a>
+                <a class="sidebar-brand brand-logo-mini" href="index.html"><img src="assets/images/logo-mini.svg"
+                        alt="logo" /></a>
+            </div>
+            <ul class="nav">
+                <li class="nav-item profile">
+                    <div class="profile-desc">
+                        <div class="profile-pic">
+                            <div class="count-indicator">
+                                <img class="img-xs rounded-circle " src="assets/images/faces/face15.jpg" alt="">
+                                <span class="count bg-success"></span>
+                            </div>
+                            <div class="profile-name">
+                                <h5 class="mb-0 font-weight-normal">Shivaprasad</h5>
+                                <span>Gold Member</span>
+                            </div>
+                        </div>
+                        <a href="#" id="profile-dropdown" data-toggle="dropdown"><i
+                                class="mdi mdi-dots-vertical"></i></a>
+                        <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list"
+                            aria-labelledby="profile-dropdown">
+                            <a href="#" class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-dark rounded-circle">
+                                        <i class="mdi mdi-settings text-primary"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <p class="preview-subject ellipsis mb-1 text-small">Account settings</p>
+                                </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-dark rounded-circle">
+                                        <i class="mdi mdi-onepassword  text-info"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
+                                </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-dark rounded-circle">
+                                        <i class="mdi mdi-calendar-today text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <p class="preview-subject ellipsis mb-1 text-small">To-do list</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item nav-category">
+                    <span class="nav-link">Navigation</span>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/dashboard">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-speedometer"></i>
+                        </span>
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/User">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-laptop"></i>
+                        </span>
+                        <span class="menu-title">User</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/allCategory">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-chart-bar"></i>
+                        </span>
+                        <span class="menu-title">Category</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/category">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-table-large"></i>
+                        </span>
+                        <span class="menu-title">Add Category</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/allProduct">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">All products</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/addProduct">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Add products</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/order">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/coupon">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Coupons</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/offer">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Offer</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/salesReport">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Sales Report</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+
+
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="row">
+                    <div class="col-12 grid-margin stretch-card">
+                        <div class="card corona-gradient-card">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Sales Report</h4>
+
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <label>Start Date</label>
+                                        <input class="form-control" type="date" name="startDate" id="startDate"
+                                            required>
+                                    </div>
+                                    <div class="col">
+                                        <label>End Date</label>
+                                        <input class="form-control" type="date" name="endDate" id="endDate" required>
+                                    </div>
+                                    <div class="col">
+                                        <label>&nbsp;</label>
+                                        <br>
+                                        <button onclick="fetchSalesReport()" class="btn btn-primary">Search</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Report Type</label>
+                                    <select class="form-control" name="reportType" id="reportType">
+                                        <option value="Daily">Daily</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Yearly">Yearly</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-12 grid-margin">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>User Name</th>
+                                                <th>Date</th>
+                                                <th>Email</th>
+                                                <th>Total</th>
+                                                <th>Payment Method</th>
+                                                <th>Status</th>
+                                            </tr>
+
+                                        </thead>
+                                        <tbody id="salesTableBody">
+                                            <!-- Iterate over all sales records -->
+                                            <% orders.forEach(order=> { %>
+                                                <tr>
+
+                                                    <td>
+                                                        <%= order.User.name %>
+                                                    </td>
+                                                    <td>
+                                                        <%= order.createdAt %>
+                                                    </td>
+                                                    <td>
+                                                        <%= order.User.email%>
+                                                    </td>
+                                                    <!-- Add more fields as needed -->
+                                                    <td>
+                                                        <%= order.totalPrice %>
+                                                    </td>
+                                                    <td>
+                                                        <%= order.paymentMethod %>
+                                                    </td>
+                                                    <td>
+                                                        <%= order.status %>
+                                                    </td>
+                                                </tr>
+                                                <% }); %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add this button in your HTML template -->
+                <button class="btn btn-outline-success" onclick="downloadSalesReport()">Download Excel</button>
+
+
+                <!-- script for downloading the sales report -->
+                <script>
+
+
+                    function downloadSalesReport() {
+                        const table = document.getElementById('salesTableBody');
+                        const rows = table.getElementsByTagName('tr');
+                        const data = [];
+
+                        for (let i = 0; i < rows.length; i++) {
+                            const cells = rows[i].getElementsByTagName('td');
+                            if (cells.length > 0) {
+                                const rowData = {
+                                    User: { name: cells[0].innerText, email: cells[2].innerText },
+                                    createdAt: cells[1].innerText,
+                                    totalPrice: cells[3].innerText,
+                                    paymentMethod: cells[4].innerText,
+                                    status: cells[5].innerText
+                                };
+                                data.push(rowData);
+                            }
+                        }
+
+                        fetch('/admin/salesreport/download', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ orders: data }),
+                        })
+                            .then(response => response.blob())
+                            .then(blob => {
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = 'sales_report.xlsx';
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                            })
+                            .catch(error => console.error('Error downloading sales report:', error));
+                    }
+
+                </script>
+
+                <!-- script for sales report -->
+                <script>
+
+
+                    function fetchSalesReport(event) {
+
+                        const startDate = document.getElementById('startDate').value;
+                        const endDate = document.getElementById('endDate').value;
+                        const reportType = document.getElementById('reportType').value;
+
+                        fetch('/admin/salesreport', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ startDate, endDate, reportType }),
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                const tableBody = document.getElementById('salesTableBody');
+                                tableBody.innerHTML = '';
+
+                                if (data.orders.length === 0) {
+                                    tableBody.innerHTML = '<tr><td colspan="6">No orders found for the selected period.</td></tr>';
+                                    return;
+                                }
+
+                                data.orders.forEach(order => {
+                                    const row = `
+                <tr>
+                    <td>${order.User ? order.User.name : 'Unknown'}</td>
+                    <td>${order.createdAt}</td>
+                    <td>${order.User ? order.User.email : 'Unknown'}</td>
+                    <td>${order.totalPrice}</td>
+                    <td>${order.paymentMethod}</td>
+                    <td>${order.status}</td>
+                </tr>
+            `;
+                                    tableBody.innerHTML += row;
+                                });
+                            })
+                            .catch(error => console.error('Error fetching sales report:', error));
+                    }
+
+
+                </script>
+
+
+            </div>
+            <!-- content-wrapper ends -->
+            <!-- partial:partials/_footer.html -->
+            <footer class="footer">
+                <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                    <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright ©
+                        bootstrapdash.com
+                        2020</span>
+                    <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a
+                            href="https://www.bootstrapdash.com/bootstrap-/admin-template/" target="_blank">Bootstrap
+                            /admin
+                            templates</a> from Bootstrapdash.com</span>
+                </div>
+            </footer>
+            <!-- partial -->
+        </div>
+
+
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="assets/vendors/js/vendor.bundle.base.js"></script>
+        <!-- endinject -->
+        <!-- Plugin js for this page -->
+        <!-- End plugin js for this page -->
+        <!-- inject:js -->
+        <script src="assets/js/off-canvas.js"></script>
+        <script src="assets/js/hoverable-collapse.js"></script>
+        <script src="assets/js/misc.js"></script>
+        <script src="assets/js/settings.js"></script>
+        <script src="assets/js/todolist.js"></script>
+        <!-- endinject -->
+        <!-- Custom js for this page -->
+        <!-- End custom js for this page -->
+</body>
+
+</html>
