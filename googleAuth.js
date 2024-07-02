@@ -6,13 +6,13 @@ require('dotenv').config();
 
 const router = express.Router();
 
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
+const googleClientID=process.env.GOOGLE_CLIENT_ID
+const googleClientSecret=process.env.GOOGLE_CLIENT_SECRET
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
 // Initiates the Google Login flow
 router.get('/auth/google', (req, res) => {
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=profile email`;
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=profile email`;
   res.redirect(url);
 });
 
@@ -23,8 +23,8 @@ router.get('/auth/google/callback', async (req, res) => {
   try {
     // Exchange authorization code for access token
     const { data } = await axios.post('https://oauth2.googleapis.com/token', {
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+      client_id: googleClientID,
+      client_secret: googleClientSecret,
       code,
       redirect_uri: REDIRECT_URI,
       grant_type: 'authorization_code',
