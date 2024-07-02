@@ -2,11 +2,12 @@
 const express = require('express');
 const axios = require('axios');
 const User = require('./model/userModel');
+require('dotenv').config();
 
 const router = express.Router();
 
-const CLIENT_ID = process.env.CLINT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
 // Initiates the Google Login flow
