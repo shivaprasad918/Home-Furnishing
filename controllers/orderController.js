@@ -9,8 +9,8 @@ const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 
 const razorpayInstance = new Razorpay({
-    key_id: process.env.KEY_ID,
-    key_secret: process.env.SECRET_KEY
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_SECRET_KEY
 });
 
 function generateUniqueID(length) {
@@ -163,7 +163,7 @@ const razorpayverifyPayment = async (req, res) => {
     try {
         const userId = req.session.user_id;
         const { order: { receipt }, payment: { razorpay_payment_id, razorpay_order_id, razorpay_signature } } = req.body;
-        const secretKey = process.env.SECRET_KEY;
+        const secretKey = process.env.RAZORPAY_SECRET_KEY;
         
         const hmac = crypto.createHmac('sha256', secretKey)
                            .update(`${razorpay_order_id}|${razorpay_payment_id}`)

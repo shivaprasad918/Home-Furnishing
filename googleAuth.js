@@ -5,9 +5,9 @@ const User = require('./model/userModel');
 
 const router = express.Router();
 
-const CLIENT_ID = '690604349083-ke8k6eo40hf66ems26uo8eu0a059pp8t.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
-const REDIRECT_URI = 'http://localhost:3005/auth/google/callback';
+const CLIENT_ID = process.env.CLINT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
 
 // Initiates the Google Login flow
 router.get('/auth/google', (req, res) => {
