@@ -15,14 +15,17 @@ const securePassword = async (password) => {
     }
 };
 
-const loadDashboard = (req, res) => {
+const loadDashboard =async (req, res) => {
     try {
-        res.render('dashboard');
+        res.render('dashboard',);
     } catch (error) {
         console.error('Error loading dashboard:', error);
         res.status(500).send('Internal Server Error');
     }
 };
+
+
+
 
 const loadLogin = (req, res) => {
     try {
@@ -72,23 +75,23 @@ const loadUser = async (req, res) => {
 
 const updateUserStatus = async (req, res) => {
     try {
-        const { action, userId } = req.params;
+        const {userId } = req.params;
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).json({ error: 'User not found ' });
+            return res.status(404).json({ error: 'User not found' });
         }
-
-        if (action === 'block') {
-            user.is_block = 'blocked'; 
-        } else if (action === 'unblock') {
-            user.is_block = 'active'; 
+      
+        if (user.is_block === 'active') {
+            user.is_block = 'blocked';
+        } else if (user.is_block === 'blocked') {
+            user.is_block = 'active';
         } else {
-            return res.status(400).json({ error: 'Invalid action' });
+            return res.status(400).json({ error: 'Invalid user status' });
         }
 
-        await user.save(); 
-        res.redirect('/admin/user'); 
+        await user.save();
+        res.redirect('/admin/user');
     } catch (error) {
         console.error('Error updating user status:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -97,97 +100,7 @@ const updateUserStatus = async (req, res) => {
 
 
 
-const getOrder = async (req, res) => {
-    try {
-        const orders = await Order.find().populate('User').populate('products');
-        res.render('order', { orders });
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Error fetching orders');
-    }
-};
 
-const updateOrderStatus = async (req, res) => {
-    const orderId = req.body.orderId;
-    const newStatus = req.body.status;
-    try {
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).send('Order not found');
-        }
-        order.status = newStatus;
-        await order.save();
-        res.redirect('/order');
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Error updating order status');
-    }
-};
-
-
-const changeStatus= async (req, res) => {
-    const { orderId, status } = req.body;
-
-    if (!orderId || !status) {
-        return res.status(400).json({ success: false, message: 'Invalid request data' });
-    }
-
-    try {
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
-
-        order.status = status;
-        await order.save();
-
-        res.json({ success: true, message: 'Order status updated successfully' });
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-}
-
-
-const acceptReturn =  async (req, res) => { 
-    const { orderId } = req.body;
-
-    try {
-        const order = await Order.findById(orderId);
-    
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
-
-        order.status = 'returned';
-        await order.save();
-
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error approving return:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-}
-
-const rejectReturn = async (req, res) => {
-    const { orderId } = req.body;
-
-    try {
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
-
-        order.status = 'delivered';
-        order.returnReason = ''; // Clear the return reason
-        await order.save();
-
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error rejecting return:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-}
 
 
 const generateSalesReport = async (req, res) => {
@@ -284,7 +197,99 @@ const downloadSalesReport = async (req, res) => {
     }
 };
 
+const admin404Error = async(req,res)=>{
+    try {
+        res.render('404-admin')
+    } catch (error) {
+        console.log(error);
+    }
+}
 
+
+
+const chartYear = async (req, res, next) => {
+    try {
+      const curntYear = new Date().getFullYear();
+  
+      const yearChart = await Order.aggregate([
+        {
+          $match: {
+            createdAt: {
+              $gte: new Date(`${curntYear - 5}-01-01`),
+              $lte: new Date(`${curntYear}-12-31`),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { $year: "$createdAt" },
+            totalAmount: { $sum: "$totalPrice" }, // Make sure to use the correct field name
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+      ]);
+  
+      res.send({ yearChart });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+  
+//  Month Chart (Put Method) :-
+  
+const monthChart = async (req, res, next) => {
+    try {
+      const monthName = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+  
+      const curntYear = new Date().getFullYear();
+  
+      const monData = await Order.aggregate([
+        {
+          $match: {
+            createdAt: {
+              $gte: new Date(`${curntYear}-01-01`),
+              $lte: new Date(`${curntYear}-12-31`),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { $month: "$createdAt" },
+            totalAmount: { $sum: "$totalPrice" }, // Ensure this field matches your schema
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+      ]);
+  
+      const salesData = Array.from({ length: 12 }, (_, i) => {
+        const monthData = monData.find((item) => item._id === i + 1);
+        return monthData ? monthData.totalAmount : 0;
+      });
+  
+      res.json({ months: monthName, salesData });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
 
 
 module.exports = {
@@ -294,12 +299,10 @@ module.exports = {
     adminLogout,
     loadUser,
     updateUserStatus,
-    getOrder,
-    updateOrderStatus,
-    changeStatus,
-    acceptReturn,
-    rejectReturn,
     renderSalesReportPage,
     generateSalesReport,
-    downloadSalesReport
+    downloadSalesReport,
+    admin404Error,
+    chartYear,
+    monthChart
 };

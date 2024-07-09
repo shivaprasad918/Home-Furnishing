@@ -1,9 +1,9 @@
 const Order = require('../model/orderSchema');
 const Cart = require('../model/Cart');
-const Coupon=require('../model/couponSchema')
+const Coupon = require('../model/couponSchema')
 const User = require('../model/userModel');
 const Product = require('../model/product');
-const mongoose = require('mongoose'); 
+const mongoose = require('mongoose');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
@@ -40,7 +40,7 @@ const placeOrder = async (req, res) => {
         const userId = req.session.user_id;
         const cart = await Cart.findOne({ userId }).populate('product.productId');
         const { selectedAddress, paymentMethod, couponCode } = req.body;
-
+        const coupon = couponCode ? await Coupon.findOne({ couponCode }) : null;
 
         if (!selectedAddress) {
             return res.status(400).json({ message: 'Please select an address.' });
@@ -51,38 +51,32 @@ const placeOrder = async (req, res) => {
         }
 
         if (!cart || cart.product.length === 0) {
-            return res.status(400).json({ message: 'No items in the cart to place an order' });
+            return res.status(400).json({ message: 'No items in the cart to place an order.' });
         }
 
         const uniqueOrderId = generateUniqueID(5);
 
-        const products = await Promise.all(cart.product.map(async (cartProduct) => {
-            const productDetails = await Product.findById(cartProduct.productId);
-           console.log(cartProduct.price);
-            productDetails.quantity -= cartProduct.quantity;
-            await productDetails.save();
+        const products = cart.product.map(cartProduct => {
+            const discount = cartProduct.discount || cartProduct.price; // Default to 0 if undefined
+            const total = discount * cartProduct.quantity; // Calculate total
+
+            if (isNaN(total)) {
+                throw new Error(`Invalid total for product ${cartProduct.productId._id}: discount=${discount}, quantity=${cartProduct.quantity}`);
+            }
+
             return {
                 product: cartProduct.productId,
-                name: productDetails.productName,
+                name: cartProduct.productId.productName,
                 price: cartProduct.price,
                 quantity: cartProduct.quantity,
-                total: cartProduct.price * cartProduct.quantity,
-                image: productDetails.product_image[0].resizedFile,
+                total: total, // Ensure total is valid
+                image: cartProduct.productId.product_image[0].resizedFile,
+                couponDiscount: discount !== cartProduct.price ? discount : 0,
+                status: 'pending'
             };
-        }));
+        });
 
-        let totalPrice = products.reduce((acc, cartProduct) => acc + cartProduct.total, 0);
-
-        // Apply coupon discount if a coupon code is provided
-        if (couponCode) {
-            const coupon = await Coupon.findOne({ couponCode });
-            if (coupon) {
-                const discountAmount = totalPrice * (coupon.discount / 100);
-                totalPrice -= discountAmount;
-            } else {
-                return res.status(400).json({ message: 'Invalid coupon code' });
-            }
-        }
+        const totalPrice = products.reduce((acc, cartProduct) => acc + cartProduct.total, 0);
 
         const order = new Order({
             User: userId,
@@ -91,7 +85,11 @@ const placeOrder = async (req, res) => {
             address: selectedAddress,
             orderId: uniqueOrderId,
             status: 'pending',
-            paymentMethod: paymentMethod
+            paymentStatus:"started",
+            paymentMethod: paymentMethod,
+            coupon: coupon ? coupon._id : null,
+            couponName: coupon ? coupon.couponName : '',
+            discount: coupon ? coupon.discount : 0 // Assuming you want to store the discount
         });
 
         await order.save();
@@ -112,62 +110,24 @@ const placeOrder = async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 };
 
 
-
-
-
-
-
-const orderDetailed = async (req, res) => {
-    try {
-        const orderId = req.params.orderId;
-        const order = await Order.findById(orderId)
-                                .populate('products.product')
-                                .populate('User');
-        if (!order) {
-            return res.status(404).send('Order not found');
-        }
-        res.render('orderDetailed', { order }); // Pass the single order to the template
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
-}
-
-const cancelOrder = async (req, res) => {
-    try {
-        const orderId = req.params.orderId;
-        const order = await Order.findById(orderId);
-
-        if (!order) {
-            return res.status(404).send('Order not found');
-        }
-
-        order.status = 'cancelled';
-        order.refundProcessed = false;  
-        await order.save();
-
-        res.redirect('/orderDetailed');
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
-};
 
 
 const razorpayverifyPayment = async (req, res) => {
     try {
         const userId = req.session.user_id;
         const { order: { receipt }, payment: { razorpay_payment_id, razorpay_order_id, razorpay_signature } } = req.body;
+            
         const secretKey = process.env.RAZORPAY_SECRET_KEY;
-        
+
         const hmac = crypto.createHmac('sha256', secretKey)
-                           .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-                           .digest('hex');
+            .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+            .digest('hex');
+            console.log('receipt',receipt);
 
         if (hmac === razorpay_signature) {
             await Order.updateOne({ orderId: receipt }, { $set: { paymentStatus: 'paid' } });
@@ -183,11 +143,46 @@ const razorpayverifyPayment = async (req, res) => {
     }
 };
 
+const razorpayfailure = async (req, res) => {
+    try {
+        const {  receipt,error,mongodbOrderIds } = req.body;
+        
+        await Order.updateOne({ _id: mongodbOrderIds }, { $set: { paymentStatus: 'failed' } });
+        res.json({ success: true, message: 'Payment failure handled' });
+    } catch (error) {
+        console.error('Error handling payment failure:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
+const retryPayment = async (req, res) => {
+    try {
+        const orderId = req.body.orderId;
+        const order = await Order.findById(orderId);
+
+       
+        const uniqueOrderId = generateUniqueID(5);
+        const razorpayOrder = await generateRazorpay(uniqueOrderId, order.totalPrice);
+    
+        await Order.updateOne({ _id: orderId }, { $set: { paymentStatus: 'paid' } });
+
+        return res.json({ order, razorpayOrder, razor: 'razorpay' });
+    } catch (error) {
+        console.error('Error retrying payment:', error);
+        return res.status(500).json({ message: 'Failed to retry payment', error: error.message });
+    }
+};
+
+
+
+
+
 
 
 const loadSuccessPage = async (req, res) => {
     try {
-        const id=req.params.id
+        const id = req.params.id
         res.render('orderSuccessPage', { orderId: id });
     } catch (error) {
         console.error(error);
@@ -199,58 +194,180 @@ const loadSuccessPage = async (req, res) => {
 
 
 
+
+const orderDetailed = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findById(orderId)
+            .populate('products.product')
+            .populate('User')
+            .populate('coupon');
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        res.render('orderDetailed', { order });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
+
+const cancelOrder = async (req, res) => {
+    const { productId } = req.body;
+    const { orderId } = req.params;
+
+    try {
+        console.log("working---------------")
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        const product = order.products.find(prod => prod._id.toString() === productId);
+
+        if (!product) {
+            return res.status(404).send('Product not found in order');
+        }
+
+        product.status = 'cancelled';
+
+        await order.save();
+
+        res.status(200).send('Product cancelled successfully');
+    } catch (error) {
+        console.error('Error cancelling product:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+
 // return order 
-const returnOrder = async (req,res) => {
-    const { orderId, reason } = req.body;
-    
+const returnOrder = async (req, res) => {
+    const { orderId, productId, reason } = req.body;
+
     try {
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        order.status = 'return-requested';
-        order.returnReason = reason; 
+        // Find the specific product in the order by productId
+        const product = order.products.find(prod => prod._id.toString() === productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found in order' });
+        }
+
+        // Update product status
+        product.status = 'return-requested';
+        product.returnReason = reason;
+
         await order.save();
 
         res.json({ success: true });
     } catch (error) {
+        console.error('Error returning product:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-}
+};
 
 
-const returnReason = async (req,res) => {
 
-    const { orderId } = req.query;
+//admin side
+
+
+const getOrder = async (req, res) => {
+    try {
+        const orders = await Order.find().populate('User').populate('products');
+        res.render('order', { orders });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).send('Error fetching orders');
+    }
+};
+
+const updateOrderAndProductStatus = async (req, res) => {
+    const { orderId, productId, status } = req.body;
+
+    if (!orderId || !productId || !status) {
+        return res.status(400).json({ success: false, message: 'Invalid request data' });
+    }
+
+    try {
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Check if payment is failed
+        if (order.paymentStatus === 'failed') {
+            return res.status(403).json({ success: false, message: 'Cannot update status. Payment failed.' });
+        }
+
+        const productToUpdate = order.products.find(product => product._id.toString() === productId);
+
+        if (!productToUpdate) {
+            return res.status(404).json({ success: false, message: 'Product not found in order' });
+        }
+
+        // Update product status
+        productToUpdate.status = status;
+        await order.save();
+
+        res.json({ success: true, message: 'Product status updated successfully', product: productToUpdate });
+    } catch (error) {
+        console.error('Error updating product status:', error);
+        res.status(500).json({ success: false, message: 'Failed to update product status' });
+    }
+};
+
+
+const getReturnReason = async (req, res) => {
+    const { orderId, productId } = req.query;
 
     try {
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
-      
 
-        res.json({ success: true, reason: order.returnReason });
+        const product = order.products.find(product => product._id.toString() === productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found in order' });
+        }
+
+        res.json({ success: true, reason: product.returnReason });
     } catch (error) {
         console.error('Error fetching return reason:', error);
-      
         res.status(500).json({ success: false, message: 'Server error' });
     }
-}
+};
 
-const acceptReturn =  async (req,res) => { 
-    const { orderId } = req.body;
-   
+
+const acceptReturn = async (req, res) => {
+    const { orderId, productId } = req.body;
 
     try {
         const order = await Order.findById(orderId);
-    
+
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        order.status = 'returned';
+        const productToUpdate = order.products.find(product => product._id.toString() === productId);
+
+        if (!productToUpdate) {
+            return res.status(404).json({ success: false, message: 'Product not found in order' });
+        }
+
+        productToUpdate.status = 'returned';
+
+        // Save the updated order
         await order.save();
 
         res.json({ success: true });
@@ -258,11 +375,10 @@ const acceptReturn =  async (req,res) => {
         console.error('Error approving return:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-}
+};
 
-
-const rejectReturn = async (req,res) => {
-    const { orderId } = req.body;
+const rejectReturn = async (req, res) => {
+    const { orderId, productId } = req.body;
 
     try {
         const order = await Order.findById(orderId);
@@ -270,8 +386,16 @@ const rejectReturn = async (req,res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        order.status = 'delivered';
-        order.returnReason = ''; // Clear the return reason
+        const productToUpdate = order.products.find(product => product._id.toString() === productId);
+
+        if (!productToUpdate) {
+            return res.status(404).json({ success: false, message: 'Product not found in order' });
+        }
+
+        productToUpdate.status = 'delivered';
+        productToUpdate.returnReason = '';
+
+        // Save the updated order
         await order.save();
 
         res.json({ success: true });
@@ -279,18 +403,21 @@ const rejectReturn = async (req,res) => {
         console.error('Error rejecting return:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
-}
-
+};
 
 
 module.exports = {
     placeOrder,
     orderDetailed,
     cancelOrder,
-    razorpayverifyPayment,
-    loadSuccessPage,
     returnOrder,
-    returnReason,
+    razorpayverifyPayment,
+    razorpayfailure,
+    loadSuccessPage,
+    getOrder,
+    updateOrderAndProductStatus,
+    getReturnReason,
     acceptReturn,
-    rejectReturn
+    rejectReturn,
+    retryPayment
 };

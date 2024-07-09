@@ -16,26 +16,27 @@ user_route.set('views', './views/users');
 user_route.use(express.json());
 user_route.use(express.urlencoded({ extended: true }));
 
-user_route.get('/', auth.isLogin, auth.isBlocked, userController.loadHome);
+user_route.get('/', auth.isLogin,auth.isBlocked, userController.loadHome);
 
-user_route.get('/register', auth.isLogin, auth.isBlocked, userController.loadRegister);
-user_route.post('/register', userController.insertUser);
+user_route.get('/register',auth.isLogin, auth.isBlocked, userController.loadRegister);
+user_route.post('/register',auth.isLogin, auth.isBlocked, userController.insertUser);
 
-user_route.get('/login', auth.isLogin, auth.isBlocked, userController.loadLogin);
-user_route.post('/login', userController.verifyLogin);
+user_route.get('/login',auth.loginPagecheck, auth.isBlocked, userController.loadLogin);
+user_route.post('/login',auth.isLogin, auth.isBlocked, userController.verifyLogin);
 
 user_route.get('/otp', auth.isBlocked, userController.loadOtp);
-user_route.post('/verify/:id', userController.verifyMail);
-user_route.post('/resend-otp', userController.resendOtp);
+user_route.post('/verify/:id',auth.isLogin, auth.isBlocked, userController.verifyMail);
+user_route.post('/resend-otp',auth.isLogin, auth.isBlocked, userController.resendOtp);
 
-user_route.get('/404', userController.load404Page);
-user_route.get('/orderSuccessPage/:id', orderController.loadSuccessPage);
+user_route.get('/logout', auth.isLogin, auth.isBlocked, userController.userLogout);
+
+
+user_route.get('/orderSuccessPage/:id',auth.isLogin, auth.isBlocked, orderController.loadSuccessPage);
 
 // profile page 
 user_route.get('/profile', auth.isLogin, auth.isBlocked, userController.loadProfile);
-user_route.post('/update', userController.updateProfile);
+user_route.post('/update',auth.isLogin, auth.isBlocked, userController.updateProfile);
 
-user_route.get('/logout', auth.isLogin, auth.isBlocked, userController.userLogout);
 
 user_route.get('/allproducts', auth.isLogin, auth.isBlocked, productController.getProducts);
 
@@ -46,36 +47,47 @@ user_route.get('/product/:productId', auth.isLogin, auth.isBlocked, productContr
 // ----------cart router starts -----------
 
 user_route.get('/cart', auth.isLogin, auth.isBlocked, cartController.loadCart);
-user_route.post('/addtoCart', cartController.addToCart);
-user_route.post('/removeFromCart', cartController.removeFromCart);
+user_route.post('/addtoCart',auth.isLogin, auth.isBlocked, cartController.addToCart);
+user_route.post('/removeFromCart',auth.isLogin, auth.isBlocked, cartController.removeFromCart);
 user_route.post('/updateCartQuantity', cartController.updateCartQuantity);
 
 //-----------------checkout----------------
 user_route.get('/checkout', auth.isLogin, auth.isBlocked, cartController.loadCheckout);
-user_route.get('/user-adress-c', auth.isBlocked, cartController.loadAddressFormCheck);
-user_route.post('/add-address-c', cartController.addAddressCheck);
-user_route.post('/deleteAddressCheck', cartController.deleteAddressCheck);
+user_route.get('/user-adress-c', auth.isLogin, auth.isBlocked, cartController.loadAddressFormCheck);
+user_route.post('/add-address-c',auth.isLogin, auth.isBlocked, cartController.addAddressCheck);
+user_route.post('/deleteAddressCheck',auth.isLogin, auth.isBlocked, cartController.deleteAddressCheck);
 
 //profile add new address
 user_route.get('/user-adress', auth.isLogin, auth.isBlocked, userController.loadAddressForm);
-user_route.post('/add-address', userController.addNewAddress);
+user_route.post('/add-address',auth.isLogin, auth.isBlocked, userController.addNewAddress);
 user_route.get('/editAdress/:addressId', auth.isLogin, auth.isBlocked, userController.editAddress);
-user_route.post('/updateAddress', userController.updateAddress);
-user_route.post('/deleteAddress', userController.deleteAddress);
+user_route.post('/updateAddress',auth.isLogin, auth.isBlocked, userController.updateAddress);
+user_route.post('/deleteAddress',auth.isLogin, auth.isBlocked, userController.deleteAddress);
 
 //order 
-user_route.post('/placedOrder', orderController.placeOrder);
-user_route.post('/verifyPayment', orderController.razorpayverifyPayment);
-user_route.get('/orderDetailed/:orderId', auth.isLogin, auth.isBlocked, orderController.orderDetailed);
-user_route.post('/cancelOrder/:orderId', orderController.cancelOrder);
+user_route.post('/placedOrder',auth.isLogin, auth.isBlocked, orderController.placeOrder);
+user_route.post('/verifyPayment',auth.isLogin, auth.isBlocked, orderController.razorpayverifyPayment);
+user_route.post('/failure',auth.isLogin, auth.isBlocked, orderController.razorpayfailure);
+user_route.post('/retryPayment', orderController.retryPayment);
+
+
+user_route.get('/orderDetailed/:orderId',auth.isLogin, auth.isBlocked, orderController.orderDetailed);
+user_route.post('/cancelOrder/:orderId', auth.isLogin, auth.isBlocked, orderController.cancelOrder);
+user_route.post('/return-order',auth.isLogin, auth.isBlocked, orderController.returnOrder);
+
+//apply coupon 
+
+user_route.post('/applyCoupon', auth.isLogin, auth.isBlocked, couponController.applyCoupon);
+
 
 //wishlist
 user_route.post('/addToWishlist', wishlistController.addToWishlist);
 user_route.get('/wishlist', auth.isLogin, auth.isBlocked, wishlistController.getUserWishlist);
 user_route.delete('/removeWishlistProduct/:productId', wishlistController.removeProductFromWishlist);
 
-// return request
-user_route.post('/return-order', orderController.returnOrder);
+
+
+user_route.get('*',userController.load404Page);
 
 
 module.exports = user_route;

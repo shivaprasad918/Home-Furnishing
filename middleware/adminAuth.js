@@ -3,13 +3,13 @@
 const isLogin = async(req,res,next)=>{
     try {
         if(!req.session.isAdminLoggedIn){
-            redirect('/admin/');
+           res.redirect('/admin');
         }
         else{
             next()
         }
     } catch (error) {
-        console.log(error);
+        console.log(error); 
     }
 }
 

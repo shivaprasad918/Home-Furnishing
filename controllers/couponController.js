@@ -1,6 +1,7 @@
 const Coupon = require('../model/couponSchema');
 const User = require('../model/userModel');
 const Product = require('../model/product');
+const Cart = require('../model/Cart');
 
 
 
@@ -76,11 +77,64 @@ const deleteCoupon = async (req, res) => {
 //user side   
 
 
+const applyCoupon = async (req, res) => {
+    try {
+        const userId = req.session.user_id;
+        const { couponCode } = req.body;
+
+        if (!couponCode) {
+            return res.status(400).json({ message: 'Please provide a coupon code.' });
+        }
+
+        const cart = await Cart.findOne({ userId }).populate('product.productId');
+
+        if (!cart || cart.product.length === 0) {
+            return res.status(400).json({ message: 'No items in the cart to apply a coupon.' });
+        }
+
+        const coupon = await Coupon.findOne({ couponCode });
+
+        if (!coupon) {
+            return res.status(400).json({ message: 'Invalid coupon code.' });
+        }
+
+        const products = cart.product;
+        const totalQuantity = products.reduce((acc, product) => acc + product.quantity, 0);
+
+        if (totalQuantity === 0) {
+            return res.status(400).json({ message: 'Total quantity is zero. Cannot apply coupon.' });
+        }
+
+        const discountPerUnit = coupon.discount / totalQuantity;
+        
+        let discountTotalPrice = 0
+        products.forEach(product => {
+            const discountAmount = Math.floor((product.price * discountPerUnit) / 100);
+            product.couponDiscount = discountAmount;
+            product.discount = product.price - discountAmount;
+            discountTotalPrice += product.discount * product.quantity
+        });
+        cart.grandTotal = discountTotalPrice
+
+        console.log(cart.grandTotal);
+        
+        await cart.save();
+
+        return res.status(200).json({ message: 'Coupon applied successfully', cart });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
+
 
 
 
 module.exports = {
     deleteCoupon,
     getCoupon,
-    createCoupon
+    createCoupon,
+    applyCoupon
 }

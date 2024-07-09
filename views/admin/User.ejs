@@ -183,28 +183,28 @@
                           </thead>
                           <tbody>
                               <% if (user.length > 0) { %>
-                                  <% for (let i = 0; i < user.length; i++) { %>
-                                      <tr>
-                                          <td><%= user[i].name %></td>
-                                          <td><%= user[i].email %></td>
-                                          <td><%= user[i].mobile %></td>
-                                          <td>
-                                            <% if (user[i].is_block === 'active') { %>
-                                                <span class="badge badge-success">Active</span>
-                                            <% } else { %>
-                                                <span class="badge badge-danger">Blocked</span>
-                                            <% } %>
-                                        </td>
-                                        <td>
-                                            <% if (user[i].is_block === 'active') { %>
-                                                <a href="/admin/block/<%= user[i]._id %>" class="btn btn-danger">Block</a>
-                                            <% } else { %>
-                                                <a href="/admin/unblock/<%= user[i]._id %>" class="btn btn-success">Unblock</a>
-                                            <% } %>
-                                        </td>
-                                        
-                                      </tr>
-                                  <% } %>
+                                <% for (let i = 0; i < user.length; i++) { %>
+                                  <tr>
+                                      <td><%= user[i].name %></td>
+                                      <td><%= user[i].email %></td>
+                                      <td><%= user[i].mobile %></td>
+                                      <td>
+                                          <% if (user[i].is_block === 'active') { %>
+                                              <span class="badge badge-success">Active</span>
+                                          <% } else { %>
+                                              <span class="badge badge-danger">Blocked</span>
+                                          <% } %>
+                                      </td>
+                                      <td>
+                                          <% if (user[i].is_block === 'active') { %>
+                                              <a href="/admin/action/<%= user[i]._id %>" class="btn btn-danger">Block</a>
+                                          <% } else { %>
+                                              <a href="/admin/action/<%= user[i]._id %>" class="btn btn-success">Unblock</a>
+                                          <% } %>
+                                      </td>
+                                  </tr>
+                              <% } %>
+                              
                               <% } else { %>
                                   <tr>
                                       <td colspan="5" class="text-center">Users Not Found</td>

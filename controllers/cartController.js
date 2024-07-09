@@ -148,17 +148,23 @@ const removeFromCart = async (req, res) => {
         const { productId } = req.body;
         const userId = req.session.user_id;
 
-        await Cart.updateOne(
+        const result = await Cart.updateOne(
             { userId: userId },
             { $pull: { product: { productId: productId } } }
         );
 
-        res.redirect('/cart');
+            // Send a success response
+            res.json({ success: true, message: 'Product removed from cart successfully.' });
+       
+        
     } catch (error) {
+        // Handle any errors
         console.log(error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
+
+
 
 
 //-------------------checkout-----------------
@@ -169,7 +175,6 @@ const loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user_id;
         const cart = await Cart.findOne({ userId: userId });
-        const coupons = await Coupon.find();
         if (!cart) {
             return res.status(404).json({ error: 'Cart not found' });
         }
@@ -182,16 +187,17 @@ const loadCheckout = async (req, res) => {
         let subtotal = 0;
 
         for (const item of cart.product) {
-            const product = await Product.findById(item.productId).populate('offer')
+            const product = await Product.findById(item.productId).populate('offer');
 
             if (product) {
-                let price
-                if(product.offer){
-                    price=Math.floor(product.price - (product.price * product.offer.percentage / 100))
-                }else{
-                    price=product.price
+                let price;
+                if (product.offer) {
+                    price = Math.floor(product.price - (product.price * product.offer.percentage / 100));
+                } else {
+                    price = product.price;
                 }
                 const productTotal = item.quantity * price;
+                // const productTotal = ((product.price * product.quantity) - ((product.price * product.couponDiscount) / 100)).toFixed()
                 products.push({
                     name: product.productName,
                     price: price,
@@ -209,12 +215,17 @@ const loadCheckout = async (req, res) => {
         const user = await User.findById(userId);
         const address = user ? user.address : null;
 
+        // Fetch coupons and filter them based on the minimum purchase amount
+        let coupons = await Coupon.find();
+        coupons = coupons.filter(coupon => coupon.minPurchaseAmount <= subtotal);
+
         res.render('checkout', { products, subtotal, grandTotal, address, coupons });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 
 

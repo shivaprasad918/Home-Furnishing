@@ -83,13 +83,12 @@
 
 
         <main class="main">
-            <div class="page-header text-center"
-                style="background-image: url('/user/assets/images/page-header-bg.jpg')">
+            <div class="page-header text-center" style="background-image: url('/user/assets/images/page-header-bg.jpg')">
                 <div class="container">
                     <h1 class="page-title">All Products<span>Shop</span></h1>
-                </div><!-- End .container -->
-            </div><!-- End .page-header -->
-
+                </div>
+            </div>
+        
             <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
                 <div class="container d-flex align-items-center">
                     <ol class="breadcrumb">
@@ -104,20 +103,18 @@
                             <option value="name" <%= sortOption === 'name' ? 'selected' : '' %>>Name</option>
                             <option value="latest" <%= sortOption === 'latest' ? 'selected' : '' %>>Latest Products</option>
                         </select>
-            
+        
                         <select name="category" id="filter" class="form-control" onchange="updateCategory(this)">
                             <option value="all" <%= selectedCategory === 'all' ? 'selected' : '' %>>All Categories</option>
                             <option value="Table" <%= selectedCategory === 'Table' ? 'selected' : '' %>>Table</option>
-                            <option value="Seating%20Furniture" <%= selectedCategory === 'Seating Furniture' ? 'selected' : '' %>>Seating Furniture</option>
-                            <option value="Bedroom%20Furniture" <%= selectedCategory === 'Bedroom Furniture' ? 'selected' : '' %>>Bedroom Furniture</option>
-                            <option value="Storage%20Furniture" <%= selectedCategory === 'Storage Furniture' ? 'selected' : '' %>>Storage Furniture</option>
+                            <option value="Seating Furniture" <%= selectedCategory === 'Seating Furniture' ? 'selected' : '' %>>Seating Furniture</option>
+                            <option value="Bedroom Furniture" <%= selectedCategory === 'Bedroom Furniture' ? 'selected' : '' %>>Bedroom Furniture</option>
+                            <option value="Storage Furniture" <%= selectedCategory === 'Storage Furniture' ? 'selected' : '' %>>Storage Furniture</option>
                         </select>
                     </nav>
                 </div>
             </nav>
-            
-            
-
+        
             <input type="hidden" value='<%= JSON.stringify(products) %>' id="dataHere">
             <script>
                 function updateSort(select) {
@@ -126,14 +123,16 @@
                     const category = document.getElementById('filter').value;
                     window.location.href = `/allproducts?sort=${encodeURIComponent(selectedSortOption)}&category=${encodeURIComponent(category)}&q=${encodeURIComponent(searchTerm)}&page=1`;
                 }
-            
+        
                 function updateCategory(select) {
-                    const selectedCategory = select.value;
-                    const searchTerm = document.getElementById('q').value;
-                    const sortOption = document.getElementById('sortby').value;
-                    window.location.href = `/allproducts?category=${encodeURIComponent(selectedCategory)}&sort=${encodeURIComponent(sortOption)}&q=${encodeURIComponent(searchTerm)}&page=1`;
+                 const selectedCategory = select.value;
+                 const searchTerm = document.getElementById('q').value;
+                 const sortOption = document.getElementById('sortby').value;
+                 window.location.href = `/allproducts?category=${encodeURIComponent(selectedCategory)}&sort=${encodeURIComponent(sortOption)}&q=${encodeURIComponent(searchTerm)}&page=1`;
                 }
-            
+
+
+        
                 function performSearch(event) {
                     event.preventDefault();
                     const searchTerm = document.getElementById('q').value;
@@ -142,84 +141,67 @@
                     window.location.href = `/allproducts?q=${encodeURIComponent(searchTerm)}&sort=${encodeURIComponent(sortOption)}&category=${encodeURIComponent(category)}&page=1`;
                 }
             </script>
-            
-            
-            
-
+        
             <div class="page-content">
                 <div class="container">
                     <div class="products">
                         <div class="row" id="productsContainer">
-                            <% products.forEach(product=> { %>
-                                <div class="col-6 col-md-4 col-lg-4 col-xl-3">
-                                    <div class="product">
-                                        <figure class="product-media">
-                                            <% if (product.new) { %>
-                                                <span class="product-label label-new">New</span>
+                            <% if (noProducts) { %>
+                                <div class="col-12">
+                                    <p class="text-center">No products found.</p>
+                                </div>
+                            <% } else { %>
+                                <% products.forEach(product => { %>
+                                    <div class="col-6 col-md-4 col-lg-4 col-xl-3">
+                                        <div class="product">
+                                            <figure class="product-media">
+                                                <% if (product.new) { %>
+                                                    <span class="product-label label-new">New</span>
                                                 <% } %>
-                                                    <a href="/singleProduct?productId=<%= product._id %>">
-                                                        <img src="<%= product.product_image[0].resizedFile %>"
-                                                            alt="Product image" class="product-image">
-                                                    </a>
-                                                    <div class="product-action-vertical">
-                                                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable"
-                                                            onclick="addToWishlist('<%= product._id %>')"><span>add to
-                                                                wishlist</span></a>
-                                                    </div>
-                                                    <div class="product-action action-icon-top">
-                                                        <a href="#" onclick="addtoCart('<%= product._id %>', event)"
-                                                            class="btn-product btn-cart"><span>add to cart</span></a>
-                                                    </div>
-                                        </figure>
-                                        <div class="product-body">
-                                            <div class="product-cat">
-                                                <a href="#">
-                                                    <%= product.category.name %>
+                                                <a href="/singleProduct?productId=<%= product._id %>">
+                                                    <img src="<%= product.product_image[0].resizedFile %>" alt="Product image" class="product-image">
                                                 </a>
-                                            </div>
-                                            <h3 class="product-title"><a href="product.html">
-                                                    <%= product.productName %>
-                                                </a></h3>
-                                            <div class="product-price">
-                                                <% if (product.offer) { %>
-                                                    ₹<%= Math.floor(product.price - (product.price *
-                                                        product.offer.percentage / 100)) %>
-                                                        <s class="text-light" style="font-size: 12px;">₹<%=
-                                                                product.price %></s>
-                                                        <% } else if (product.category && product.category.offer) { %>
-                                                            ₹<%= Math.floor(product.price - (product.price *
-                                                                product.category.offer.percentage / 100)) %>
-                                                                <s class="text-light" style="font-size: 12px;">₹<%=
-                                                                        product.price %></s>
-                                                                <% } else { %>
-                                                                    ₹<%= product.price %>
-                                                                        <% } %>
-
-                                            </div>
-                                            <div class="ratings-container">
-                                                <div class="ratings">
-                                                    <div class="ratings-val" style="width: 80%;"></div>
+                                                <div class="product-action-vertical">
+                                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable" onclick="addToWishlist('<%= product._id %>')"><span>add to wishlist</span></a>
                                                 </div>
-                                             
+                                                <div class="product-action action-icon-top">
+                                                    <a href="#" onclick="addtoCart('<%= product._id %>', event)" class="btn-product btn-cart"><span>add to cart</span></a>
+                                                </div>
+                                            </figure>
+                                            <div class="product-body">
+                                                <div class="product-cat">
+                                                    <a href="#"><%= product.category.name %></a>
+                                                </div>
+                                                <h3 class="product-title"><a href="product.html"><%= product.productName %></a></h3>
+                                                <div class="product-price">
+                                                    <% if (product.offer) { %>
+                                                        ₹<%= Math.floor(product.price - (product.price * product.offer.percentage / 100)) %>
+                                                        <s class="text-light" style="font-size: 12px;">₹<%= product.price %></s>
+                                                    <% } else if (product.category && product.category.offer) { %>
+                                                        ₹<%= Math.floor(product.price - (product.price * product.category.offer.percentage / 100)) %>
+                                                        <s class="text-light" style="font-size: 12px;">₹<%= product.price %></s>
+                                                    <% } else { %>
+                                                        ₹<%= product.price %>
+                                                    <% } %>
+                                                </div>
+                                                <div class="ratings-container">
+                                                    <div class="ratings">
+                                                        <div class="ratings-val" style="width: 80%;"></div>
+                                                    </div>
+                                                </div>
+                                                <p class="product-description"><%= product.description %></p>
+                                                <p class="product-quantity">Quantity: <%= product.quantity %></p>
                                             </div>
-                                            <p class="product-description">
-                                                <%= product.description %>
-                                            </p>
-                                            <p class="product-quantity">Quantity: <%= product.quantity %>
-                                            </p>
                                         </div>
                                     </div>
-                                </div>
                                 <% }); %>
+                            <% } %>
                         </div>
-
-
                     </div>
                 </div>
             </div>
         </main>
-
-
+        
         <div class="d-flex justify-content-center">
             <nav aria-label="Page navigation">
                 <ul class="pagination">
@@ -249,6 +231,7 @@
                 </ul>
             </nav>
         </div>
+        
         
         
 

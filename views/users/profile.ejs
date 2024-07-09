@@ -255,7 +255,7 @@
                                                         <h5>Transaction History</h5>
                                                         <ul id="transaction-list">
                                                             <% if(userWallet.transactions && userWallet.transactions.length > 0){ %>
-                                                                <% userWallet.transactions.forEach(transaction => { %>
+                                                                <% userWallet.transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(transaction => { %>
                                                                     <li><%= transaction.date.toISOString().split('T')[0] %> - <%= transaction.type %> : ₹<%= transaction.transactionAmount %> (<%= transaction.reason %>)</li>
                                                                 <% }) %>
                                                             <% } else { %>
@@ -267,6 +267,7 @@
                                             </div>
                                         </div>
                                     </div><!-- .End .tab-pane -->
+                                    
                                     
 								</div>
 	                		</div><!-- End .col-lg-9 -->

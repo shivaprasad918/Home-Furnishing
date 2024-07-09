@@ -22,8 +22,8 @@ const userRoute = require('./routes/userRoute');
 const adminRoute = require('./routes/adminRoute');
 const googleAuth = require('./googleAuth');
 
-app.use('/', userRoute);
 app.use('/admin', adminRoute);
+app.use('/', userRoute);
 app.use('/', googleAuth);
 
 

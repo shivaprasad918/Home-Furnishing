@@ -3,15 +3,31 @@ const User=require('../model/userModel')
 const isLogin = async(req,res,next)=>{
     try {
         if(!req.session){
-            redirect('/');
+            res.redirect('/');
         }
         else{
             next()
         }
     } catch (error) {
         console.log(error);
+    
     }
 }
+
+const loginPagecheck = async(req,res,next)=>{
+    try {
+        if(!req.session.user_id){
+            next()
+        }
+        else{
+            res.redirect('/')
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 
 
 //blocking the user
@@ -42,5 +58,6 @@ const isBlocked = async (req, res, next) => {
 
 module.exports = {
     isLogin,
-    isBlocked
+    isBlocked,
+    loginPagecheck
 }

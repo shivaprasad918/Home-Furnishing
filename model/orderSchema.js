@@ -12,31 +12,44 @@ const orderSchema = new mongoose.Schema({
         price: { type: Number, required: true },
         quantity: { type: Number, required: true },
         total: { type: Number, required: true },
-        image: { type: String }
+        image: { type: String },
+        couponDiscount: { type: Number },
+        status: { type: String, enum: ['pending', 'shipped', 'delivered', 'cancelled', 'returned', 'return-requested'], default: 'pending' },
+        returnReason: { type: String } 
     }],
     totalPrice: {
         type: Number,
         required: true
     },
-    status: {
-        type: String,
-        enum: ['pending', 'processing', 'shipped', 'delivered','cancelled','returned','return-requested'],
-        default: 'pending'
-    },
     createdAt: {
         type: Date,
         default: Date.now
     },
+    orderId: {
+        type: String,
+    },
     paymentMethod: {
         type: String,
-        // required:true
     },
-    returnReason: {
-        type: String
+    paymentStatus: {
+        type: String,
     },
     refundProcessed: {
         type: Boolean,
         default: false
+    },
+    coupon: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Coupon',
+        default: null
+    },
+    discount: {
+        type: Number,
+        default: 0
+    },
+    couponName: {
+        type: String,
+        default: ''
     }
 });
 

@@ -16,6 +16,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="user/assets/images/icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="user/assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="user/assets/images/icons/favicon-16x16.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="manifest" href="user/assets/images/icons/site.html">
     <link rel="mask-icon" href="user/assets/images/icons/safari-pinned-tab.svg" color="#666666">
     <link rel="shortcut icon" href="user/assets/images/icons/favicon.ico">
@@ -128,13 +129,15 @@
                             <form id="order-form" action="/placeOrder" method="post">
                                 <div class="checkout-discount">
                                     <h6>Have a Coupon?</h6>
-                                    <input type="text" class="form-control" required id="checkout-discount-input" name="couponCode">
-                                    <button type="button" onclick="removeCoupon()" id="remove-coupon-button">Remove Coupon</button>
+                                    <input type="text" class="form-control" required id="checkout-discount-input"
+                                        name="couponCode">
+                                    <button type="button" onclick="removeCoupon()" id="remove-coupon-button">Remove
+                                        Coupon</button>
                                 </div>
                                 <input type="hidden" name="couponCode" id="hidden-coupon-code">
                             </form>
                         </div><!-- End .checkout-discount -->
-                        
+
 
 
                         <!-- Modal for selecting coupon -->
@@ -232,7 +235,8 @@
                                                                 <td><a href="#">
                                                                         <%= product.name %>
                                                                     </a></td>
-                                                                <td><%= product.total.toFixed(2) %>
+                                                                <td>
+                                                                    <%= product.total.toFixed(2) %>
                                                                 </td>
                                                             </tr>
                                                             <% }); %>
@@ -267,42 +271,55 @@
                                                 document.getElementById('checkout-discount-input').addEventListener('click', function () {
                                                     $('#couponModal').modal('show');
                                                 });
-                                            
+
                                                 document.getElementById('applyCouponButton').addEventListener('click', function () {
                                                     const selectedCoupon = document.getElementById('couponSelect').selectedOptions[0];
                                                     const couponCode = selectedCoupon.value;
-                                                    const discount = parseFloat(selectedCoupon.getAttribute('data-discount'));
-                                            
-                                                    // Apply the coupon code to the input field
-                                                    document.getElementById('checkout-discount-input').value = couponCode;
-                                                    document.getElementById('hidden-coupon-code').value = couponCode;
-                                            
-                                                    // Calculate the new grand total
-                                                    let grandTotal = parseFloat('<%= grandTotal %>');
-                                                    grandTotal -= (grandTotal * discount / 100);
-                                            
-                                                    // Update the grand total in the table
-                                                    document.getElementById('grandTotal').innerText = '' + grandTotal.toFixed(2);
-                                            
-                                                    // Close the modal
-                                                    $('#couponModal').modal('hide');
+
+                                                    fetch('/applyCoupon', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json'
+                                                        },
+                                                        body: JSON.stringify({ couponCode })
+                                                    })
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            if (data.message === 'Coupon applied successfully') {
+                                                                const cart = data.cart;
+                                                                let grandTotal = cart.grandTotal;
+
+                                                                document.getElementById('grandTotal').innerText = grandTotal.toFixed(2);
+                                                                document.getElementById('checkout-discount-input').value = couponCode;
+                                                                document.getElementById('hidden-coupon-code').value = couponCode;
+
+                                                                // Close the modal
+                                                                $('#couponModal').modal('hide');
+                                                            } else {
+                                                                alert(data.message);
+                                                            }
+                                                        })
+                                                        .catch(error => {
+                                                            console.error('Error:', error);
+                                                            alert('An error occurred while applying the coupon.');
+                                                        });
                                                 });
-                                            
+
                                                 // Ensure coupon code is included in form submission
                                                 document.getElementById('order-form').addEventListener('submit', function (event) {
                                                     const couponCode = document.getElementById('checkout-discount-input').value;
                                                     document.getElementById('hidden-coupon-code').value = couponCode;
                                                 });
-                                            
+
                                                 // Function to remove the coupon and update the grand total
                                                 function removeCoupon() {
                                                     // Reset the grand total to its original value
                                                     document.getElementById('grandTotal').innerText = '<%= grandTotal %>';
-                                            
+
                                                     // Clear the coupon code fields
                                                     document.getElementById('checkout-discount-input').value = '';
                                                     document.getElementById('hidden-coupon-code').value = '';
-                                            
+
                                                     // Ensure the form submission will not include a coupon code
                                                     document.getElementById('hidden-coupon-code').value = '';
                                                     window.location.reload()
@@ -312,51 +329,80 @@
                                         </table>
 
                                         <div class="accordion-summary" id="accordion-payment">
-                                            <div class="card">
-                                                <div class="card-header" id="heading-cod">
-                                                    <h2 class="card-title">
-                                                        <label>
-                                                            <input type="radio" value="cash on delivery" name="payment"
-                                                                data-id="cash on delivery">
-                                                            Cash on delivery
-                                                        </label>
-                                                    </h2>
+
+                                            <% if (grandTotal> 1000) { %>
+                                                <div class="card">
+                                                    <div class="card-header" id="heading-cod">
+                                                        <h2 class="card-title">
+                                                            <label>
+                                                                <input type="radio" value="cash on delivery"
+                                                                    name="payment" data-id="cash on delivery">
+                                                                Cash on delivery
+                                                            </label>
+                                                        </h2>
+                                                    </div>
+                                                    <div id="collapse-cod" class="collapse"
+                                                        aria-labelledby="heading-cod" data-parent="#accordion-payment">
+                                                        <div class="card-body">Pay with cash upon delivery.</div>
+                                                    </div>
                                                 </div>
-                                                <div id="collapse-cod" class="collapse" aria-labelledby="heading-cod"
-                                                    data-parent="#accordion-payment">
-                                                    <div class="card-body">Pay with cash upon delivery.</div>
-                                                </div>
-                                            </div>
-                                            <div class="card">
-                                                <div class="card-header" id="heading-razorpay">
-                                                    <h2 class="card-title">
-                                                        <label>
-                                                            <input type="radio" id="paymentMethod" name="payment"
-                                                                value="razorpay" data-id="RazorPay">
-                                                            Online payment
-                                                        </label>
-                                                    </h2>
-                                                </div>
-                                                <div id="collapse-razorpay" class="collapse"
-                                                    aria-labelledby="heading-razorpay" data-parent="#accordion-payment">
-                                                    <div class="card-body">UPI and Cards accepted.</div>
-                                                </div>
-                                            </div>
-                                            <div class="card">
-                                                <div class="card-header" id="heading-wallet">
-                                                    <h2 class="card-title">
-                                                        <label>
-                                                            <input type="radio" id="paymentMethod" name="payment"
-                                                                value="wallet" data-id="wallet">
-                                                            Wallet
-                                                        </label>
-                                                    </h2>
-                                                </div>
-                                                <div id="collapse-wallet" class="collapse"
-                                                    aria-labelledby="heading-wallet" data-parent="#accordion-payment">
-                                                    <div class="card-body">Pay using your wallet balance.</div>
-                                                </div>
-                                            </div>
+                                                <% } else { %>
+                                                    <div class="card">
+                                                        <div class="card-header" id="heading-no-cod">
+                                                            <h2 class="card-title">
+                                                                <label>
+                                                                    Cash on Delivery not available for orders below
+                                                                    ₹1000.
+                                                                </label>
+                                                            </h2>
+                                                        </div>
+                                                        <div id="collapse-no-cod" class="collapse"
+                                                            aria-labelledby="heading-no-cod"
+                                                            data-parent="#accordion-payment">
+                                                            <div class="card-body">
+                                                                Please select an alternative payment method.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% } %>
+
+
+
+                                                        <div class="card">
+                                                            <div class="card-header" id="heading-razorpay">
+                                                                <h2 class="card-title">
+                                                                    <label>
+                                                                        <input type="radio" id="paymentMethod"
+                                                                            name="payment" value="razorpay"
+                                                                            data-id="RazorPay">
+                                                                        Online payment
+                                                                    </label>
+                                                                </h2>
+                                                            </div>
+                                                            <div id="collapse-razorpay" class="collapse"
+                                                                aria-labelledby="heading-razorpay"
+                                                                data-parent="#accordion-payment">
+                                                                <div class="card-body">UPI and Cards accepted.</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card">
+                                                            <div class="card-header" id="heading-wallet">
+                                                                <h2 class="card-title">
+                                                                    <label>
+                                                                        <input type="radio" id="paymentMethod"
+                                                                            name="payment" value="wallet"
+                                                                            data-id="wallet">
+                                                                        Wallet
+                                                                    </label>
+                                                                </h2>
+                                                            </div>
+                                                            <div id="collapse-wallet" class="collapse"
+                                                                aria-labelledby="heading-wallet"
+                                                                data-parent="#accordion-payment">
+                                                                <div class="card-body">Pay using your wallet balance.
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                         </div>
 
                                         <button type="button" class="btn btn-outline-primary-2 btn-order btn-block"
@@ -374,7 +420,7 @@
         </main><!-- End .main -->
 
 
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
 
             document.getElementById('placeOrderBtn').addEventListener('click', function () {
@@ -382,7 +428,11 @@
                 const paymentMethod = document.querySelector('input[name="payment"]:checked');
 
                 if (!selectedAddress) {
-                    alert('Please select an address to proceed.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please select a address to proceed.',
+                    });
                     return;
                 }
 
@@ -436,9 +486,6 @@
                     })
 
 
-
-
-
                     .catch(error => {
                         console.error('There was a problem with your fetch operation:', error);
                         Swal.fire({
@@ -454,32 +501,82 @@
                     "key": "rzp_test_jlcz2tde9ilmmY",
                     "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                     "currency": "INR",
-                    "name": "Home Furnishing", //your business name
+                    "name": "Home Furnishing", // Your business name
                     "description": "Test Transaction",
                     "image": "https://example.com/your_logo",
-                    "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                    "order_id": order.id, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
                     "handler": function (response) {
-
                         verifyPayment(response, order, orderId);
                     },
                     "prefill": {
-                        "name": "Gaurav Kumar", //your customer's name
+                        "name": "Gaurav Kumar", // Your customer's name
                         "email": "gaurav.kumar@example.com",
-                        "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+                        "contact": "9000090000"  // Provide the customer's phone number for better conversion rates 
                     },
                     "notes": {
                         "address": "Razorpay Corporate Office"
                     },
                     "theme": {
                         "color": "#3399cc"
+                    },
+                    "modal": {
+                        "ondismiss": function () {
+
+                        }
                     }
                 };
 
                 var rzp1 = new Razorpay(options);
+
+                rzp1.on('payment.failed', function (response) {
+                    // Display custom error message above Razorpay popup
+
+
+                    // Handle the failed payment response
+                    $.ajax({
+                        url: '/failure',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            razorpayOrderId: response.error.metadata.order_id,
+                            error: response.error,
+                            paymentResponse: response,
+                            mongodbOrderIds: orderId
+                        }),
+                        success: async function (serverResponse) {
+                            console.log('Server Response:', serverResponse);
+                            paymentError(rzp1)
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Ajax error:', status, error);
+                        }
+                    });
+                });
+
                 rzp1.open();
             }
 
+            function paymentError(rzp1) {
+
+                rzp1.close()
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Failed',
+                    text: "There was a problem with your payment. Please try again later",
+                    timer: 5000,
+                    timerProgressBar: true
+                }).then(() => {
+                    window.location.reload()
+                })
+
+
+                // Your existing code here...
+            }
+
+
             function verifyPayment(payment, order, orderId) {
+                console.log(order);
                 fetch('/verifyPayment', {
                     method: 'POST',
                     headers: {
@@ -499,24 +596,13 @@
                     })
                     .catch(error => {
                         console.error('Error verifying payment:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Payment failed',
-                            text: 'There was a problem with your payment. Please try again later.',
-                        });
+                        // Swal.fire({
+                        //     icon: 'error',
+                        //     title: 'Payment Failed',
+                        //     text: 'There was a problem with your payment. Please try again later.',
+                        // });
                     });
             }
-
-
-            $.ajax({
-                url: '/verifyPayment',
-                data: {
-                    payment,
-                    order
-                },
-                method: 'post'
-            })
-
 
 
         </script>

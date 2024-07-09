@@ -23,13 +23,14 @@ const securePassword = async (password) => {
 const loadHome = async (req, res) => {
     try {
         let user;
+        const products = await Product.find({})
         if (req.session.user_id) {
             user = await User.findById(req.session.user_id);
         } else if (req.session.user) {
             // For Google sign-up
             user = req.session.user_id;
         }
-        res.render('home', { user });
+        res.render('home', { user , products});
     } catch (error) {
         console.error('Error in loadHome:', error);
         res.render('error', { message: 'An error occurred while loading the home page' });
@@ -234,15 +235,13 @@ const load404Page = async(req,res)=>{
 
 
 
-
-
 const userLogout = async(req,res)=>{
     try {
         req.session.destroy((err)=>{
             if(err){
                 console.log(err);
             }else{
-                res.redirect('/login')
+                res.redirect('/')
             }
         })  
     } catch (error) {
@@ -504,8 +503,6 @@ const deleteAddress = async(req,res)=>{
 
 
 
-
-
 module.exports = {
     loadHome,
     loadLogin,
@@ -524,4 +521,4 @@ module.exports = {
     updateAddress,
     deleteAddress,
     load404Page
-};
+}

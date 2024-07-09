@@ -42,7 +42,7 @@ const loadEditCategory = async (req, res) => {
 }
 
 
-const blockOrUnblock = async (req, res) => {
+const updateCategorStatus = async (req, res) => {
     try {
         const categoryId = req.query.id;
         const category = await Category.findById(categoryId);
@@ -116,7 +116,7 @@ module.exports = {
     loadCategory,
     addCategory,
     loadEditCategory,
-    blockOrUnblock,
+    updateCategorStatus,
     loadUpdateCategory,
     updateCategory,
     softDeleteCategory,

@@ -257,7 +257,6 @@ const getProducts = async (req, res) => {
     try {
         const { sort, category, q, page } = req.query;
 
-        // Pagination parameters
         const perPage = 8;
         const currentPage = parseInt(page, 10) || 1;
         const skip = (currentPage - 1) * perPage;
@@ -288,10 +287,8 @@ const getProducts = async (req, res) => {
         // Sort products based on the sort parameter
         let sortObj = {};
         if (sort) {
-            if (sort === 'priceLowToHigh') {
-                sortObj.price = 1;
-            } else if (sort === 'priceHighToLow') {
-                sortObj.price = -1;
+            if (sort === 'priceLowToHigh' || sort === 'priceHighToLow') {
+                sortObj.effectivePrice = sort === 'priceLowToHigh' ? 1 : -1;
             } else if (sort === 'name') {
                 sortObj.productName = 1;
             } else if (sort === 'latest') {
@@ -299,24 +296,42 @@ const getProducts = async (req, res) => {
             }
         }
 
-        const totalProducts = await Product.countDocuments(filter);
-        const totalPages = Math.ceil(totalProducts / perPage);
         const products = await Product.find(filter)
             .populate('category')
             .populate('offer')
-            .sort(sortObj)
-            .limit(perPage)
-            .skip(skip)
             .exec();
+
+        products.forEach(product => {
+            if (product.offer) {
+                product.effectivePrice = product.price - (product.price * product.offer.percentage / 100);
+            } else if (product.category && product.category.offer) {
+                product.effectivePrice = product.price - (product.price * product.category.offer.percentage / 100);
+            } else {
+                product.effectivePrice = product.price;
+            }
+        });
+
+        if (sort === 'priceLowToHigh' || sort === 'priceHighToLow') {
+            products.sort((a, b) => (sort === 'priceLowToHigh' ? a.effectivePrice - b.effectivePrice : b.effectivePrice - a.effectivePrice));
+        } else if (sort === 'name') {
+            products.sort((a, b) => a.productName.localeCompare(b.productName));
+        } else if (sort === 'latest') {
+            products.sort((a, b) => b.createdAt - a.createdAt);
+        }
+
+        const totalProducts = products.length;
+        const totalPages = Math.ceil(totalProducts / perPage);
+        const paginatedProducts = products.slice(skip, skip + perPage);
 
         res.render('allProducts', {
             currentPage,
             totalPages,
-            products,
+            products: paginatedProducts,
             sortOption: sort || 'default',
             selectedCategory: category || 'all',
             searchTerm: q || '',
-            queryParams: `&q=${q || ''}&sort=${sort || 'default'}&category=${category || 'all'}`
+            queryParams: `&q=${q || ''}&sort=${sort || 'default'}&category=${category || 'all'}`,
+            noProducts: paginatedProducts.length === 0
         });
 
     } catch (error) {
@@ -324,6 +339,11 @@ const getProducts = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
+
+
+
+
 
 
 

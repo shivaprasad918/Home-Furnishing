@@ -24,50 +24,54 @@ adminRoute.get('/dashboard', auth.isLogin, adminController.loadDashboard);
 adminRoute.get('/', adminController.loadLogin);
 adminRoute.post('/', adminController.verifyLogin);
 adminRoute.get('/logout', adminController.adminLogout)
+
+
 adminRoute.get('/user', auth.isLogin, adminController.loadUser);
 adminRoute.get('/action/:userId', auth.isLogin, adminController.updateUserStatus);
 
 // Category routes
 adminRoute.get('/category', auth.isLogin, categoryController.loadCategory);
-adminRoute.post('/category', categoryController.addCategory);
+adminRoute.post('/category',auth.isLogin, categoryController.addCategory);
 adminRoute.get('/allCategory', auth.isLogin, categoryController.loadEditCategory);
-adminRoute.post('/allCategory', categoryController.blockOrUnblock);
+adminRoute.post('/allCategory',auth.isLogin, categoryController.updateCategorStatus);
 adminRoute.get('/updateCategory', auth.isLogin, categoryController.loadUpdateCategory);
-adminRoute.post('/updateCategory', categoryController.updateCategory);
-adminRoute.post('/delete-category/:id', categoryController.softDeleteCategory);
+adminRoute.post('/updateCategory',auth.isLogin, categoryController.updateCategory);
+adminRoute.post('/delete-category/:id',auth.isLogin, categoryController.softDeleteCategory);
 
 // Product routes
 adminRoute.get('/allProduct', auth.isLogin, productController.loadAllProduct);
 adminRoute.get('/addProduct', auth.isLogin, productController.loadAddProduct);
-adminRoute.post('/AddProductPost', upload.array('product_image', 3), productController.addProduct);
-adminRoute.post('/fetch-subcategory', productController.getSubcategories);
+adminRoute.post('/AddProductPost',auth.isLogin, upload.array('product_image', 3), productController.addProduct);
+adminRoute.post('/fetch-subcategory',auth.isLogin, productController.getSubcategories);
 adminRoute.get('/editProduct/:productId', auth.isLogin, productController.renderEditProductPage);
-adminRoute.post('/editProduct/:productId', upload.array('product_image', 3), productController.editProduct);
-adminRoute.post('/deleteProductImage/:productId', productController.deleteProductImage);
-adminRoute.post('/delete-products/:id/delete', productController.softDeleteProducts);
+adminRoute.post('/editProduct/:productId',auth.isLogin, upload.array('product_image', 3), productController.editProduct);
+adminRoute.post('/deleteProductImage/:productId',auth.isLogin, productController.deleteProductImage);
+adminRoute.post('/delete-products/:id/delete',auth.isLogin, productController.softDeleteProducts);
 
 // Order routes
-adminRoute.get('/order', auth.isLogin, adminController.getOrder);
-adminRoute.post('/order/update-status', adminController.updateOrderStatus);
-adminRoute.post('/admin/order/update-status', adminController.changeStatus);
+adminRoute.get('/order', auth.isLogin, orderController.getOrder);
+adminRoute.post('/order/update-status', auth.isLogin, orderController.updateOrderAndProductStatus);
+adminRoute.get('/get-return-reason', auth.isLogin, orderController.getReturnReason);
+adminRoute.post('/accept-return', auth.isLogin, orderController.acceptReturn);
+adminRoute.post('/reject-return', auth.isLogin, orderController.rejectReturn);
+
+
 
 
 // Coupon routes
-adminRoute.post('/createCoupon', couponController.createCoupon);
+adminRoute.post('/createCoupon',auth.isLogin, couponController.createCoupon);
 adminRoute.get('/coupon', auth.isLogin, couponController.getCoupon);
-adminRoute.delete('/deleteCoupon/:id', couponController.deleteCoupon);
+adminRoute.delete('/deleteCoupon/:id',auth.isLogin, couponController.deleteCoupon);
 
 // Offer routes
-adminRoute.post('/createOffer', offerController.createOffer);
+adminRoute.post('/createOffer',auth.isLogin, offerController.createOffer);
 adminRoute.get('/offer', auth.isLogin, offerController.getOffers);
-adminRoute.delete('/deleteOffer/:id', offerController.deleteOffer);
-adminRoute.post('/applyOffer/:productId', productController.applyOffer);
+adminRoute.delete('/deleteOffer/:id',auth.isLogin, offerController.deleteOffer);
+adminRoute.post('/applyOffer/:productId',auth.isLogin, productController.applyOffer);
 
 
-// Return request routes
-adminRoute.get('/get-return-reason', orderController.returnReason);
-adminRoute.post('/accept-return', orderController.acceptReturn);
-adminRoute.post('/reject-return', orderController.rejectReturn);
+
+
 
 
 // sales report
@@ -78,5 +82,14 @@ adminRoute.post('/salesreport/download', adminController.downloadSalesReport);
 
 
 
+//chart related
+
+adminRoute.put('/chartYear', adminController.chartYear);
+
+adminRoute.put('/monthChart', adminController.monthChart);
+
+
+
+adminRoute.get('*',adminController.admin404Error)
 
 module.exports = adminRoute;
