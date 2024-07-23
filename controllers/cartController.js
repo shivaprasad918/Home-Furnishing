@@ -23,11 +23,11 @@ const addToCart = async (req, res) => {
         }
 
         const image = product.product_image[0].resizedFile;
-        let  price 
-        if(product.offer){
-            price=Math.floor(product.price - (product.price * product.offer.percentage / 100))
-        }else{
-            price=product.price
+        let price
+        if (product.offer) {
+            price = Math.floor(product.price - (product.price * product.offer.percentage / 100))
+        } else {
+            price = product.price
         }
 
         let cart = await Cart.findOne({ userId });
@@ -84,7 +84,7 @@ const addToCart = async (req, res) => {
 const loadCart = async (req, res) => {
     try {
         const userId = req.session.user_id;
-        
+
         if (!userId) {
             return res.redirect('login');
         }
@@ -98,7 +98,7 @@ const loadCart = async (req, res) => {
         const cartItems = cart.product.filter(item => item.productId);
 
         const subtotal = cartItems.reduce((sum, item) => sum + item.total, 0);
-        const grandTotal = subtotal; 
+        const grandTotal = subtotal;
 
         res.render('cart', { cart, subtotal, grandTotal });
     } catch (error) {
@@ -156,10 +156,10 @@ const removeFromCart = async (req, res) => {
             { $pull: { product: { productId: productId } } }
         );
 
-            // Send a success response
-            res.json({ success: true, message: 'Product removed from cart successfully.' });
-       
-        
+        // Send a success response
+        res.json({ success: true, message: 'Product removed from cart successfully.' });
+
+
     } catch (error) {
         // Handle any errors
         console.log(error);
@@ -217,7 +217,7 @@ const loadCheckout = async (req, res) => {
         const user = await User.findById(userId);
         const address = user ? user.address : null;
 
-       
+
         let coupons = await Coupon.find();
         coupons = coupons.filter(coupon => coupon.minPurchaseAmount <= subtotal);
 
@@ -235,7 +235,7 @@ const loadCheckout = async (req, res) => {
 //add,edit,delete address in checkout
 
 
-const loadAddressFormCheck = async(req,res)=>{
+const loadAddressFormCheck = async (req, res) => {
     try {
         res.render('add-address-c')
     } catch (error) {
@@ -267,7 +267,7 @@ const addAddressCheck = async (req, res) => {
             return res.status(400).send('Address is already used');
         }
 
-      
+
         const newAddress = {
             name,
             phone,
@@ -293,7 +293,7 @@ const deleteAddressCheck = async (req, res) => {
     try {
         const userId = req.session.user_id;
         const { addressId } = req.body;
-     
+
 
         if (!userId || !addressId) {
             return res.status(400).json({ error: 'Missing user ID or address ID' });

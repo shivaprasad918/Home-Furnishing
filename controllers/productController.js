@@ -16,11 +16,11 @@ const loadAddProduct = async (req, res) => {
         const map = new Map();
         for (const category of categories) {
             if (!map.has(category.categoryName)) {
-                map.set(category.categoryName, true);   
+                map.set(category.categoryName, true);
                 uniqueCategories.push(category);
             }
         }
-        
+
         res.render('addProduct', { categories: uniqueCategories });
     } catch (error) {
         console.error('Error fetching categories:', error);
@@ -53,7 +53,7 @@ const addProduct = async (req, res) => {
 
                 return {
                     filename: file.filename,
-                    path: `/upload/${file.filename}`, 
+                    path: `/upload/${file.filename}`,
                     resizedFile: `/upload/${resizedFilename}`
                 };
             } catch (error) {
@@ -81,7 +81,7 @@ const addProduct = async (req, res) => {
 };
 
 
- 
+
 
 
 
@@ -89,8 +89,8 @@ const getSubcategories = async (req, res) => {
     const { selectedOption } = req.body;
     try {
         const category = await Category.find({ categoryName: selectedOption })
-        console.log(category,"fetching ");
-    
+        console.log(category, "fetching ");
+
         if (!category) {
             return res.status(404).json({ error: 'Category not found' });
         }
@@ -109,7 +109,7 @@ const getSubcategories = async (req, res) => {
 const loadAllProduct = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 8; 
+        const limit = parseInt(req.query.limit) || 8;
 
         const skip = (page - 1) * limit;
 
@@ -125,8 +125,8 @@ const loadAllProduct = async (req, res) => {
 
         const offers = await Offer.find({ status: true });
 
-        res.render('allProduct', { 
-            products, 
+        res.render('allProduct', {
+            products,
             offers,
             currentPage: page,
             totalPages: Math.ceil(totalProducts / limit)
@@ -146,14 +146,14 @@ const softDeleteProducts = async (req, res) => {
         const productId = req.params.id;
         // Update the isDeleted field to true for the product with the given id
         const product = await Product.findById(productId);
-        
+
         if (!product) {
             return res.status(404).send("Product not found");
         }
 
         product.isDeleted = true;
         await product.save(); // Save the changes
-        
+
         res.redirect('/admin/allProduct');
     } catch (error) {
         console.log(error.message);
@@ -169,14 +169,14 @@ const renderEditProductPage = async (req, res) => {
         console.log(`Fetching product with ID: ${productId}`); // Debugging line
 
         const product = await Product.findById(productId).populate('category');
-        
+
         if (!product) {
             console.error(`Product not found with ID: ${productId}`);
             return res.status(404).send({ error: "Product not found" });
         }
 
         const categories = await Category.distinct('categoryName', {
-            is_delete: false 
+            is_delete: false
         });
 
         console.log(categories);
@@ -208,7 +208,7 @@ const editProduct = async (req, res) => {
             price: productPrice,
             quantity,
             description: productDescription,
-            brand 
+            brand
         };
 
         if (req.files && req.files.length > 0) {
@@ -226,7 +226,7 @@ const editProduct = async (req, res) => {
                     return {
                         filename: file.filename,
                         path: `/upload/${file.filename}`,
-                        resizedFile:` /upload/${resizedFilename}`
+                        resizedFile: ` /upload/${resizedFilename}`
                     };
                 } catch (error) {
                     console.log("Error processing image:", error);
@@ -247,7 +247,7 @@ const editProduct = async (req, res) => {
 
 
 
-const deleteProductImage = async (req,res)=>{
+const deleteProductImage = async (req, res) => {
 
     const productId = req.params.productId;
     const imgId = req.query.imgId;
@@ -261,7 +261,7 @@ const deleteProductImage = async (req,res)=>{
             return res.status(404).json({ message: "Product not found" });
         }
 
-        await Product.updateOne({_id:productId},{$pull:{product_image:{_id:imgId}}})
+        await Product.updateOne({ _id: productId }, { $pull: { product_image: { _id: imgId } } })
 
         return res.redirect(`/admin/editProduct/${productId}`);
     } catch (error) {
@@ -273,8 +273,6 @@ const deleteProductImage = async (req,res)=>{
 
 
 // list product on user side
-
-
 
 
 const getProducts = async (req, res) => {
@@ -323,17 +321,27 @@ const getProducts = async (req, res) => {
         }
 
         const products = await Product.find(filter)
-            .populate('category')
+            .populate({
+                path: 'category',
+                populate: {
+                    path: 'offers',
+                },
+            })
             .populate('offer')
             .exec();
 
         products.forEach(product => {
             if (product.offer) {
-                product.effectivePrice = product.price - (product.price * product.offer.percentage / 100);
-            } else if (product.category && product.category.offer) {
-                product.effectivePrice = product.price - (product.price * product.category.offer.percentage / 100);
+                product.effectivePrice = Math.floor(product.price - (product.price * product.offer.percentage / 100));
+                product.discounted = true;
+                product.originalPrice = product.price;
+            } else if (product.category && product.category.offers) {
+                product.effectivePrice = Math.floor(product.price - (product.price * product.category.offers.percentage / 100));
+                product.discounted = true;
+                product.originalPrice = product.price;
             } else {
                 product.effectivePrice = product.price;
+                product.discounted = false;
             }
         });
 
@@ -373,7 +381,7 @@ const getProducts = async (req, res) => {
 
 
 
-const getSingleProduct = async (req,res)=>{
+const getSingleProduct = async (req, res) => {
     try {
         const productId = req.query.productId;
         const product = await Product.findById(productId).populate('category').populate('offer');
@@ -382,14 +390,14 @@ const getSingleProduct = async (req,res)=>{
             category: product.category._id,
             isDeleted: false
         }).limit(4).exec();
-        res.render('singleProduct',{product,relatedProducts})
+        res.render('singleProduct', { product, relatedProducts })
     } catch (error) {
         console.log(error);
     }
 }
 
 const getProductAndRelated = async (req, res) => {
-    console.log('getProductAndRelated function called'); 
+    console.log('getProductAndRelated function called');
     try {
         const productId = req.params.id;
         const product = await Product.findById(productId).populate('category').exec();
@@ -404,7 +412,7 @@ const getProductAndRelated = async (req, res) => {
             isDeleted: false
         }).limit(4).exec();
 
-        console.log('Related Products:', relatedProducts); 
+        console.log('Related Products:', relatedProducts);
 
         res.render('users/singleProduct', { product: product, relatedProducts: relatedProducts });
     } catch (error) {

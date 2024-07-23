@@ -48,8 +48,8 @@ const createCoupon = async (req, res) => {
 
 const getCoupon = async (req, res) => {
     try {
-       const coupon = await Coupon.find()
-        res.render('coupon',{coupon})
+        const coupon = await Coupon.find()
+        res.render('coupon', { coupon })
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -60,9 +60,9 @@ const getCoupon = async (req, res) => {
 const deleteCoupon = async (req, res) => {
     try {
         const { id } = req.params;
-        
+
         const deletedCoupon = await Coupon.findByIdAndDelete(id);
-        
+
         if (!deletedCoupon) {
             return res.status(404).json({ error: 'Coupon not found' });
         }
@@ -106,7 +106,7 @@ const applyCoupon = async (req, res) => {
         }
 
         const discountPerUnit = coupon.discount / totalQuantity;
-        
+
         let discountTotalPrice = 0
         products.forEach(product => {
             const discountAmount = Math.floor((product.price * discountPerUnit) / 100);
@@ -117,7 +117,7 @@ const applyCoupon = async (req, res) => {
         cart.grandTotal = discountTotalPrice
 
         console.log(cart.grandTotal);
-        
+
         await cart.save();
 
         return res.status(200).json({ message: 'Coupon applied successfully', cart });

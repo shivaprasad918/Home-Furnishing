@@ -31,7 +31,7 @@ const loadHome = async (req, res) => {
             // For Google sign-up
             user = req.session.user_id;
         }
-        res.render('home', { user , products});
+        res.render('home', { user, products });
     } catch (error) {
         console.error('Error in loadHome:', error);
         res.render('error', { message: 'An error occurred while loading the home page' });
@@ -127,8 +127,8 @@ const loadOtp = async (req, res) => {
     try {
         const email = req.query.email;
         console.log(email);
-        res.render('otp',{email,message:""});
-       
+        res.render('otp', { email, message: "" });
+
     } catch (error) {
         console.log(error);
     }
@@ -180,21 +180,21 @@ const sendVerifyEmail = async (name, email, user_id, otp) => {
 
 const verifyMail = async (req, res) => {
     try {
-        const { otp } = req.body; 
+        const { otp } = req.body;
         const email = req.params.id;
-        const user = await User.findOne({email:email});
-        const userId=user._id
-        const userOtp = await UserOtp.findOne({userId:userId});
+        const user = await User.findOne({ email: email });
+        const userId = user._id
+        const userOtp = await UserOtp.findOne({ userId: userId });
         const Otp = userOtp.otp
- 
 
-        if(otp==Otp){
+
+        if (otp == Otp) {
             user.is_verified = true;
             user.save()
             res.redirect('/')
         }
-        else{
-            res.render('otp',{email,message:"OTP is incorrect"})
+        else {
+            res.render('otp', { email, message: "OTP is incorrect" })
         }
 
 
@@ -204,29 +204,29 @@ const verifyMail = async (req, res) => {
     }
 };
 
-const resendOtp = async (req,res)=>{
+const resendOtp = async (req, res) => {
     try {
-        const {email} = req.body;
-        const user =await User.findOne({email});
+        const { email } = req.body;
+        const user = await User.findOne({ email });
         console.log(user);
-        if(!user){
+        if (!user) {
             return res.status(404).render('404')
         }
         const newOTP = generateOTP();
         console.log(newOTP);
 
-        await UserOtp.findOneAndUpdate({userId:user._id},{otp:newOTP}, { upsert: true });
+        await UserOtp.findOneAndUpdate({ userId: user._id }, { otp: newOTP }, { upsert: true });
 
-        return res.status(200).json({ message: "OTP resent successfully"});
+        return res.status(200).json({ message: "OTP resent successfully" });
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ error: "Internal server error"});
+        return res.status(500).json({ error: "Internal server error" });
     }
 }
 
 
 
-const resetPass = async(req,res)=>{
+const resetPass = async (req, res) => {
     try {
         res.render('resetPassMail');
     } catch (error) {
@@ -338,7 +338,7 @@ const changePassword = async (req, res) => {
 
         await user.save();
 
-        return res.status(200).json({ success:true});
+        return res.status(200).json({ success: true });
 
     } catch (error) {
         console.error('Error in changePassword:', error);
@@ -353,7 +353,7 @@ const changePassword = async (req, res) => {
 
 
 
-const load404Page = async(req,res)=>{
+const load404Page = async (req, res) => {
     try {
         res.render('404')
     } catch (error) {
@@ -363,15 +363,15 @@ const load404Page = async(req,res)=>{
 
 
 
-const userLogout = async(req,res)=>{
+const userLogout = async (req, res) => {
     try {
-        req.session.destroy((err)=>{
-            if(err){
+        req.session.destroy((err) => {
+            if (err) {
                 console.log(err);
-            }else{
+            } else {
                 res.redirect('/')
             }
-        })  
+        })
     } catch (error) {
         console.log(error);
     }
@@ -503,7 +503,7 @@ const updateProfile = async (req, res) => {
 
 //add,edit,delete address in profile
 
-const loadAddressForm = async (req,res)=>{
+const loadAddressForm = async (req, res) => {
     try {
         res.render('user-adress')
     } catch (error) {
@@ -517,7 +517,7 @@ const addNewAddress = async (req, res) => {
         const userId = req.session.user_id;
         const { name, phone, buildingName, city, district, state, postcode } = req.body;
 
-     
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).render('404');
@@ -572,8 +572,8 @@ const editAddress = async (req, res) => {
         if (!address) {
             return res.status(404).render('404')
         }
-        
-        res.render('editAdress', { address }); 
+
+        res.render('editAdress', { address });
     } catch (error) {
         console.log(error);
         res.status(500).send('Internal Server Error');
@@ -584,7 +584,7 @@ const editAddress = async (req, res) => {
 const updateAddress = async (req, res) => {
     try {
         const { addressId, name, phone, buildingName, city, district, state, postcode } = req.body;
-        console.log(name,"name");
+        console.log(name, "name");
         const userId = req.session.user_id;
 
 
@@ -593,7 +593,7 @@ const updateAddress = async (req, res) => {
             return res.status(404).render('404')
         }
         console.log(user);
-        console.log( userId);
+        console.log(userId);
 
         // Update the specific address within the user's addresses
         await User.updateOne(
@@ -618,16 +618,16 @@ const updateAddress = async (req, res) => {
     }
 };
 
-const deleteAddress = async(req,res)=>{
+const deleteAddress = async (req, res) => {
     try {
         const userId = req.session.user_id;
-        const {addressId} = req.body;
+        const { addressId } = req.body;
         const updateUser = await User.findOneAndUpdate(
-            {_id:userId},
-            {$pull:{address:{_id:addressId}}},
-            {new:true}
+            { _id: userId },
+            { $pull: { address: { _id: addressId } } },
+            { new: true }
         );
-        if(!updateUser){
+        if (!updateUser) {
             return res.status(404).json({ error: 'User is not found' });
         }
         res.redirect('/profile')

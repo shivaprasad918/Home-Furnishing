@@ -7,7 +7,7 @@ const Product = require('../model/product');
 const addToWishlist = async (req, res) => {
     const { productId } = req.body;
     const userId = req.session.user_id; // Assuming you have user authentication set up
-  
+
 
     try {
         let wishlist = await Wishlist.findOne({ user: userId });
@@ -45,7 +45,7 @@ const getUserWishlist = async (req, res) => {
         if (wishlist && wishlist.products) {
             wishlist.products = wishlist.products.filter(product => product.productId !== null);
         }
-        
+
         res.render('wishlist', { wishlist });
     } catch (error) {
         console.log(error);

@@ -126,13 +126,13 @@ const razorpayverifyPayment = async (req, res) => {
     try {
         const userId = req.session.user_id;
         const { order: { receipt }, payment: { razorpay_payment_id, razorpay_order_id, razorpay_signature } } = req.body;
-            
+
         const secretKey = process.env.RAZORPAY_SECRET_KEY;
 
         const hmac = crypto.createHmac('sha256', secretKey)
             .update(`${razorpay_order_id}|${razorpay_payment_id}`)
             .digest('hex');
-            console.log('receipt',receipt);
+        console.log('receipt', receipt);
 
         if (hmac === razorpay_signature) {
             await Order.updateOne({ orderId: receipt }, { $set: { paymentStatus: 'paid' } });
@@ -150,8 +150,8 @@ const razorpayverifyPayment = async (req, res) => {
 
 const razorpayfailure = async (req, res) => {
     try {
-        const {  receipt,error,mongodbOrderIds } = req.body;
-        
+        const { receipt, error, mongodbOrderIds } = req.body;
+
         await Order.updateOne({ _id: mongodbOrderIds }, { $set: { paymentStatus: 'failed' } });
         res.json({ success: true, message: 'Payment failure handled' });
     } catch (error) {
@@ -166,10 +166,10 @@ const retryPayment = async (req, res) => {
         const orderId = req.body.orderId;
         const order = await Order.findById(orderId);
 
-       
+
         const uniqueOrderId = generateUniqueID(5);
         const razorpayOrder = await generateRazorpay(uniqueOrderId, order.totalPrice);
-    
+
         await Order.updateOne({ _id: orderId }, { $set: { paymentStatus: 'paid' } });
 
         return res.json({ order, razorpayOrder, razor: 'razorpay' });
@@ -278,11 +278,11 @@ const returnOrder = async (req, res) => {
 };
 
 
-const downloadInvoice = async(req,res)=>{
+const downloadInvoice = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const order = await Order.findById(orderId).populate('User').exec();
-        
+
 
         // if (!order) {
         //     return res.status(404).send('Order not found');
@@ -304,30 +304,30 @@ const downloadInvoice = async(req,res)=>{
 
         await page.goto(invoiceUrl, { waitUntil: 'networkidle2' });
         const pdf = await page.pdf({ format: 'A4' });
-    
+
         await browser.close();
-    
+
         res.set({
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': 'attachment; filename="hn.pdf"',
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': 'attachment; filename="hn.pdf"',
         });
-    
+
         res.send(pdf);
-       
+
     } catch (error) {
         res.status(500).send(error);
     }
 }
 
 
-const getInvoice =async(req,res)=>{
+const getInvoice = async (req, res) => {
     try {
-        const{orderId} = req.params
+        const { orderId } = req.params
         const order = await Order.findById(orderId).populate('User').exec();
 
-        res.render('invoice',{order})
+        res.render('invoice', { order })
     } catch (error) {
-        
+
     }
 }
 
@@ -337,7 +337,7 @@ const getInvoice =async(req,res)=>{
 
 const getOrder = async (req, res) => {
     try {
-        const orders = await Order.find({paymentStatus:{$ne:'failed'}}).populate('User').populate('products');
+        const orders = await Order.find({ paymentStatus: { $ne: 'failed' } }).populate('User').populate('products');
         res.render('order', { orders });
     } catch (error) {
         console.error('Error fetching orders:', error);
@@ -345,14 +345,14 @@ const getOrder = async (req, res) => {
     }
 };
 
-const getOrderDetails = async(req,res)=>{
+const getOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const order = await Order.findById(orderId)
             .populate('User')
             .populate('products.product')
             .populate('coupon');
-        
+
         res.render('adminOrderDetailed', { order });
     } catch (error) {
         console.error('Error fetching order details:', error);
@@ -481,7 +481,7 @@ const rejectReturn = async (req, res) => {
         productToUpdate.status = 'rejected';
         productToUpdate.rejectReason = reason;
 
-       
+
         await order.save();
 
         res.json({ success: true });

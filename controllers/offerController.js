@@ -28,7 +28,7 @@ const createOffer = async (req, res) => {
 const getOffers = async (req, res) => {
     try {
         const offers = await Offer.find();
-        res.render('offer',{offers})
+        res.render('offer', { offers })
         // res.status(200).json({ offers });
     } catch (error) {
         res.status(500).json({ error: error.message });
