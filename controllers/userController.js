@@ -6,6 +6,7 @@ const Order = require('../model/orderSchema');
 const Cart = require("../model/Cart");
 const Product = require("../model/product");
 const Wallet = require('../model/wallet');
+const crypto = require('crypto');
 
 require('dotenv').config();
 
@@ -39,7 +40,7 @@ const loadHome = async (req, res) => {
 
 const loadRegister = async (req, res) => {
     try {
-        res.render('register');
+        res.render('register', { registrationMessage: req.session.registrationMessage || null });
     } catch (error) {
         console.error('Error in loadRegister:', error);
         res.render('error', { message: 'An error occurred while loading the registration page' });
@@ -62,13 +63,13 @@ const insertUser = async (req, res) => {
                 is_admin: 0
             });
 
-            await user.save();
-
             const otp = generateOTP();
             sendVerifyEmail(req.body.name, req.body.email, user._id, otp);
 
+            await user.save();
+
             req.session.registrationMessage = 'Your registration has been successful.';
-            req.session.user_id = user._id; // Set session variable after registration
+            req.session.user_id = user._id;
             return res.redirect(`/otp?email=${req.body.email}`);
         }
     } catch (error) {
@@ -77,6 +78,7 @@ const insertUser = async (req, res) => {
         return res.redirect('/register');
     }
 };
+
 
 const loadLogin = async (req, res) => {
     try {
@@ -186,20 +188,18 @@ const verifyMail = async (req, res) => {
         const Otp = userOtp.otp
  
 
-        user.is_verified = true;
-        await user.save();
-
         if(otp==Otp){
+            user.is_verified = true;
+            user.save()
             res.redirect('/')
         }
         else{
-            res.render('otp',{message:"OTP is incorrect"})
+            res.render('otp',{email,message:"OTP is incorrect"})
         }
 
 
     } catch (error) {
         console.log(error);
-        // Render the OTP page with an error message in case of any errors
         return res.render('otp', { message: "An error occurred. Please try again later." });
     }
 };
@@ -223,6 +223,134 @@ const resendOtp = async (req,res)=>{
         return res.status(500).json({ error: "Internal server error"});
     }
 }
+
+
+
+const resetPass = async(req,res)=>{
+    try {
+        res.render('resetPassMail');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+const sendPasswordResetEmail = async (email, token) => {
+    try {
+        const transporter = nodeMailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Password Reset Link',
+            text: `Click this link to reset your password: http://localhost:3005/reset-password/${token}`,
+            html: `<p>Click <a href="http://localhost:3005/reset-password/${token}">here</a> to reset your password.</p>`
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log('Password reset email sent');
+    } catch (error) {
+        console.error('Error sending password reset email:', error);
+        throw new Error('Failed to send password reset email');
+    }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'Email not found' });
+        }
+
+        const token = crypto.randomBytes(20).toString('hex');
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+        await user.save();
+        console.log('Token generated:', token);
+
+        await sendPasswordResetEmail(email, token);
+
+        res.json({ message: 'Please check your email' });
+    } catch (error) {
+        console.error('Error in resetPassword:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
+
+const verifyResetToken = async (req, res) => {
+    try {
+        const { token } = req.params;
+        console.log(`Received token: ${token}`);
+
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).send('Invalid or expired token');
+        }
+
+        res.render('changePass', { token });
+    } catch (error) {
+        console.error('Error in verifyResetToken:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+
+const changePassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { newPassword, confirmPassword } = req.body;
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
+        console.log('Changing password for token:', token);
+
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
+
+        // Hash the password before saving
+        user.password = await bcrypt.hash(newPassword, 10);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        return res.status(200).json({ success:true});
+
+    } catch (error) {
+        console.error('Error in changePassword:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
+
+
+
+
 
 
 const load404Page = async(req,res)=>{
@@ -260,12 +388,11 @@ const loadProfile = async (req, res) => {
         const user = await User.findOne({ _id: userId });
 
         if (!user) {
-            return res.render('404');
+            return res.redirect('login');
         }
 
         let userWallet = await Wallet.findOne({ userId: userId });
 
-        // If the user doesn't have a wallet, create one
         if (!userWallet) {
             userWallet = new Wallet({ userId: userId });
             await userWallet.save();
@@ -275,24 +402,25 @@ const loadProfile = async (req, res) => {
         let totalRefund = 0;
         let refundTransactions = [];
 
-        // Check for canceled orders and update the wallet
+        // Check for canceled products and update the wallet
         for (const order of orders) {
-            // Only process refunds for orders that are cancelled and not yet refunded
-            if (order.status === 'cancelled' && !order.refundProcessed) {
-                totalRefund += order.totalPrice;
+            for (const product of order.products) {
+                if (product.status === 'cancelled' && !product.refundProcessed) {
+                    totalRefund += product.total;
 
-                // Prepare transaction for the refund
-                refundTransactions.push({
-                    type: 'credit',
-                    reason: 'Order Cancellation',
-                    transactionAmount: order.totalPrice,
-                    date: new Date()  // Add date to transaction
-                });
+                    // Prepare transaction for the refund
+                    refundTransactions.push({
+                        type: 'credit',
+                        reason: 'Product Cancellation',
+                        transactionAmount: product.total,
+                        date: new Date()  // Add date to transaction
+                    });
 
-                // Mark the order as refund processed to avoid duplicate refunds
-                order.refundProcessed = true;
-                await order.save();
+                    // Mark the product as refund processed to avoid duplicate refunds
+                    product.refundProcessed = true;
+                }
             }
+            await order.save(); // Save the order with updated product statuses
         }
 
         // Update the wallet balance if there were any refunds
@@ -319,6 +447,7 @@ const loadProfile = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
 
@@ -383,15 +512,29 @@ const loadAddressForm = async (req,res)=>{
 }
 
 
-const addNewAddress = async (req,res) => {
+const addNewAddress = async (req, res) => {
     try {
-        const userId =  req.session.user_id; 
+        const userId = req.session.user_id;
         const { name, phone, buildingName, city, district, state, postcode } = req.body;
 
-        // Find the user by ID
+     
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).render('404')
+            return res.status(404).render('404');
+        }
+
+        const addressExists = user.address.some(addr =>
+            addr.name === name &&
+            addr.phone === phone &&
+            addr.buildingName === buildingName &&
+            addr.city === city &&
+            addr.district === district &&
+            addr.state === state &&
+            addr.postcode === postcode
+        );
+
+        if (addressExists) {
+            return res.status(400).render('error', { message: 'Address is already used' });
         }
 
         const newAddress = {
@@ -405,17 +548,15 @@ const addNewAddress = async (req,res) => {
         };
 
         user.address.push(newAddress);
-        
-    
         await user.save();
 
-        
-        res.redirect('/profile')
-
+        res.redirect('/profile');
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        res.status(500).render('error', { message: 'Server Error' });
     }
-}
+};
+
 
 const editAddress = async (req, res) => {
     try {
@@ -513,6 +654,10 @@ module.exports = {
     verifyMail,
     userLogout,
     resendOtp,
+    resetPass,
+    resetPassword,
+    verifyResetToken,
+    changePassword,
     loadProfile,
     updateProfile,
     loadAddressForm,

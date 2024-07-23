@@ -19,6 +19,8 @@
   <!-- End layout styles -->
   <link rel="shortcut icon" href="/admin/assets/images/favicon.png" />
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script defer src="https://cdn.crop.guide/loader/l.js?c=PVBLBH"></script>
+
 
 </head>
 
@@ -164,6 +166,11 @@
             value="<%= product.productName %>" required>
           <div class="invalid-feedback">Please enter a product name.</div>
         </div>
+
+        <div class="form-group">
+          <label for="brand">Brand</label>
+          <input type="text" class="form-control" id="brand" name="brand" value="<%= product.brand %>" required>
+      </div>
 
         <!-- Price, Quantity, and Discount -->
         <div class="form-row">

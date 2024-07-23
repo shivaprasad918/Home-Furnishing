@@ -166,78 +166,76 @@
       <div class="container-fluid mt-3">
         <div class="row justify-content-center">
             <div class="col-md-8">
-              <div class="category mt-5 p-3">
-                <h2 class="cate-title text-white font-weight-bold mb-4">Category Management</h2>
-                <form id="addCategoryForm" action="/admin/category" method="POST" class="category-form" onsubmit=" return validateForm();">
-                    <div class="form-group">
-                        <label for="categoryLabel" class="font-weight-bold">Category </label>
-                        <select class="form-control" id="categoryLabel" name="categoryLabel" required>    
-                            <option value="">Select category</option>
-                            <option value="Table">Table</option>
-                            <option value="Seating Furniture">Seating Furniture</option>
-                            <option value="Bedroom Furniture">Bedroom Furniture</option>
-                            <option value="Storage Furniture">Storage Furniture</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="subcategory" class="font-weight-bold">Sub category</label>
-                        <input class="form-control" id="subcategory" name="subcategory" required>
-                        <div id="subcategoryError" class="error-message"></div> <!-- Display error message here -->
-                    </div>
-                    <div class="form-group">
-                        <label for="categoryDescription" class="font-weight-bold">Category Description</label>
-                        <textarea class="form-control" id="categoryDescription" name="categoryDescription" rows="6" required></textarea>
-                        <div id="categoryDescriptionError" class="error-message"></div> <!-- Display error message here -->
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Category</button>
-                </form>
+                <div class="category mt-5 p-3">
+                    <h2 class="cate-title text-white font-weight-bold mb-4">Category Management</h2>
+                    <form id="addCategoryForm" action="/admin/category" method="POST" class="category-form" onsubmit="return validateForm(event);">
+                        <div class="form-group">
+                            <label for="categoryLabel" class="font-weight-bold">Category</label>
+                            <input type="text" class="form-control" id="categoryLabel" name="categoryLabel" required>
+                            <div id="categoryLabelError" class="error-message"></div> 
+                        </div>
+                        <div class="form-group">
+                            <label for="subcategory" class="font-weight-bold">Sub category</label>
+                            <input type="text" class="form-control" id="subcategory" name="subcategory" required>
+                            <div id="subcategoryError" class="error-message"></div> <!-- Display error message here -->
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryDescription" class="font-weight-bold">Category Description</label>
+                            <textarea class="form-control" id="categoryDescription" name="categoryDescription" rows="6" required></textarea>
+                            <div id="categoryDescriptionError" class="error-message"></div> <!-- Display error message here -->
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Category</button>
+                    </form>
+                </div>
             </div>
-        
-            <script>
-                function validateForm() {
-                    // Get form inputs
-                    var categoryLabel = document.getElementById('categoryLabel').value;
-                    var subcategory = document.getElementById('subcategory').value.trim();
-                    var categoryDescription = document.getElementById('categoryDescription').value.trim();
-                    
-                    // Validation flag
-                    var isValid = true;
-                    
-                    // Check if category is selected
-                    if (categoryLabel === '') {
-                        isValid = false;
-                        swal("Error", "Please select a category.", "error");
-                        return false; // Return false to prevent form submission
-                    }
-                    
-                    // Check if subcategory is provided
-                    if (subcategory === '') {
-                        isValid = false;
-                        swal("Error", "Please provide a subcategory.", "error");
-                        return false; // Return false to prevent form submission
-                    }
-                    
-                    // Check if category description is provided
-                    if (categoryDescription === '') {
-                        isValid = false;
-                        swal("Error", "Please provide a category description.", "error");
-                        return false; // Return false to prevent form submission
-                    }
-                    
-                    // Check for white spaces
-                    if (!subcategory.trim()) {
-                        isValid = false;
-                        swal("Error", "Subcategory cannot be empty or contain only white spaces.", "error");
-                        return false; // Return false to prevent form submission
-                    }
-                    if (!categoryDescription.trim()) {
-                        isValid = false;
-                        swal("Error", "Category description cannot be empty or contain only white spaces.", "error");
-                        return false; // Return false to prevent form submission
-                    }
-                    
-                    // If the form is valid, show the success message
-                    if (isValid) {
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    
+    <script>
+        async function validateForm(event) {
+            event.preventDefault();
+    
+      
+            const categoryLabel = document.getElementById('categoryLabel').value.trim();
+            const subcategory = document.getElementById('subcategory').value.trim();
+            const categoryDescription = document.getElementById('categoryDescription').value.trim();
+    
+            let isValid = true;
+    
+            if (categoryLabel === '') {
+                isValid = false;
+                Swal.fire("Error", "Please provide a category.", "error");
+                return false; 
+            }
+    
+         
+            if (subcategory === '') {
+                isValid = false;
+                Swal.fire("Error", "Please provide a subcategory.", "error");
+                return false; 
+            }
+
+            if (categoryDescription === '') {
+                isValid = false;
+                Swal.fire("Error", "Please provide a category description.", "error");
+                return false; 
+            }
+    
+            if (isValid) {
+                try {
+                    const response = await fetch('/admin/category', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ categoryLabel, subcategory, categoryDescription })
+                    });
+    
+                    const result = await response.json();
+    
+                    if (response.ok) {
                         Swal.fire({
                             title: 'Success',
                             text: 'Category added successfully!',
@@ -245,22 +243,34 @@
                             confirmButtonText: 'OK'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                document.getElementById('addCategoryForm').submit(); // Submit the form programmatically
+                                document.getElementById('addCategoryForm').reset(); // Reset the form
                             }
                         });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: result.error,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
                     }
-        
-                    // Return false to prevent the form from submitting before showing the success message
-                    return false;
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'An error occurred while adding the category.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            </script>
-            </div>
-        </div>
-    </div>
+            }
     
-
-      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+            // Return false to prevent the form from submitting in the traditional way
+            return false;
+        }
+    </script>
+    
+    
     <script src="assets/vendors/js/vendor.bundle.base.js"></script>
     <!-- endinject -->
     <!-- Plugin js for this page -->

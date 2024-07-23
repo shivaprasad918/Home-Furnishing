@@ -163,44 +163,38 @@
               <form action="/admin/updateCategory" method="POST" class="category-form" id="categoryForm">
                 <div class="form-group">
                   <label for="categoryLabel" class="font-weight-bold">Category</label>
-                  <select class="form-control" id="categoryLabel" name="categoryLabel" required>
-                    <option value="">Select category</option>
-                    <option value="Table" <% if (category.categoryName === 'Table') { %> selected <% } %>>Tables</option>
-                    <option value="Seating Furniture" <% if (category.categoryName === 'Seating Furniture') { %> selected <% } %>>Seating Furniture</option>
-                    <option value="Bedroom Furniture" <% if (category.categoryName === 'Bedroom Furniture') { %> selected <% } %>>Bedroom Furniture</option>
-                    <option value="Storage Furniture" <% if (category.categoryName === 'Storage Furniture') { %> selected <% } %>>Storage Furniture</option>
-                  </select>
+                  <input type="text" class="form-control" id="categoryLabel" name="categoryLabel" value="<%= category.categoryName %>" required>
                 </div>
                 <div class="form-group">
                   <label for="subcategory" class="font-weight-bold">Sub category</label>
-                  <input class="form-control" value="<%= category.subCategory %>" id="subcategory" name="subcategory">
+                  <input type="text" class="form-control" id="subcategory" name="subcategory" value="<%= category.subCategory %>" required>
                 </div>
                 <div class="form-group">
                   <label for="categoryDescription" class="font-weight-bold">Category Description</label>
-                  <textarea class="form-control" id="categoryDescription" name="categoryDescription" rows="6"><%= category.description %></textarea>
+                  <textarea class="form-control" id="categoryDescription" name="categoryDescription" rows="6" required><%= category.description %></textarea>
                 </div>
                 <input type="hidden" name="categoryId" value="<%= category._id %>">
                 <button type="submit" class="btn btn-primary" id="editCategoryBtn">Edit Category</button>
               </form>
             </div>
-            
+      
             <script>
               document.getElementById('editCategoryBtn').addEventListener('click', function(event) {
                 event.preventDefault();
                 const form = document.getElementById('categoryForm');
-                const categoryLabel = document.getElementById('categoryLabel').value;
+                const categoryLabel = document.getElementById('categoryLabel').value.trim();
                 const subcategory = document.getElementById('subcategory').value.trim();
                 const categoryDescription = document.getElementById('categoryDescription').value.trim();
-            
+      
                 if (categoryLabel === '') {
                   Swal.fire({
                     icon: 'error',
                     title: 'Validation Error',
-                    text: 'Please select a category.'
+                    text: 'Please enter a category.'
                   });
                   return;
                 }
-            
+      
                 if (subcategory === '') {
                   Swal.fire({
                     icon: 'error',
@@ -209,7 +203,7 @@
                   });
                   return;
                 }
-            
+      
                 if (categoryDescription === '') {
                   Swal.fire({
                     icon: 'error',
@@ -218,7 +212,7 @@
                   });
                   return;
                 }
-            
+      
                 Swal.fire({
                   title: 'Are you sure?',
                   text: "Do you want to update this category?",
@@ -240,10 +234,11 @@
                 });
               });
             </script>
-            
+      
           </div>
         </div>
       </div>
+      
       
     
     

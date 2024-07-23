@@ -167,144 +167,197 @@
         <h2 class="head mt-4">All products</h2>
     </div> -->
 
-    <div class="container mt-5 ">
-      <div class="card ">
-         
+    <div class="container mt-5">
+      <div class="card">
           <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-striped w-100">
-                  <thead class="thead-dark">
-                      <tr>
-                          <th>Product Name</th>
-                          <th>Price</th>
-                          <th>Quantity</th>
-                          <th>Category</th>
-                          <th>Subcategory</th>
-                          <th>Offers</th>
-                          <th>Edit</th>
-                          <th>Delete</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <% products.forEach(product => { %>
-                      <tr>
-                          <td><%= product.productName %></td>
-                          <td><%= product.price.toFixed(2) %></td>
-                          <td><%= product.quantity %></td>
-                          <td><%= product.category.categoryName %></td>
-                          <td><%= product.category.subCategory %></td>
-                          <td>
-                              <button class="btn btn-success apply-offer" data-product-id="<%= product._id %>">Apply Offer</button>
-                          </td>
-                          <td><a href="/admin/editProduct/<%= product._id %>" class="btn btn-primary">Edit</a></td>
-                          <td>
-                              <form id="deleteForm" action="/admin/delete-products/<%= product._id %>/delete" method="POST">
-                                  <button type="submit" id="confirmDeleteButton" class="btn btn-danger">Delete</button>
-                              </form>
-                          </td>
-                      </tr>
-                      <% }) %>
-                  </tbody>
-              </table>
-              
-              <!-- Offer Modal -->
-              <style>
-                .modal-dialog-custom {
-                    max-width: 30%; /* Adjust this value as needed */
-                }
-            </style>
-            
-            <div class="modal fade" id="offerModal" tabindex="-1" role="dialog" aria-labelledby="offerModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-custom" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="offerModalLabel">Available Offers</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="offerList">
-                                <% offers.forEach(offer => { %>
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><%= offer.name %> (<%= offer.percentage %>% Off)</h5>
-                                        <p class="card-text">Valid from <%= offer.startDate %> to <%= offer.endDate %></p>
-                                        <button class="btn btn-primary select-offer" data-offer-id="<%= offer._id %>">Select Offer</button>
-                                    </div>
-                                </div>
-                                <% }) %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                  <table class="table table-striped w-100">
+                      <thead class="thead-dark">
+                          <tr>
+                              <th>Product Name</th>
+                              <th>Price</th>
+                              <th>Quantity</th>
+                              <th>Brand</th>
+                              <th>Category</th>
+                              <th>Subcategory</th>
+                              <th>Offers</th>
+                              <th>Edit</th>
+                              <th>Delete</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <% products.forEach(product => { %>
+                          <tr>
+                              <td><%= product.productName %></td>
+                              <td><%= product.price.toFixed(2) %></td>
+                              <td><%= product.quantity %></td>
+                              <td><%= product.brand %></td>
+                              <td><%= product.category ? product.category.categoryName : 'N/A' %></td>
+                              <td><%= product.category ? product.category.subCategory : 'N/A' %></td>
+                              <td>
+                                  <button class="btn btn-success apply-offer" data-product-id="<%= product._id %>">Apply Offer</button>
+                              </td>
+                              <td><a href="/admin/editProduct/<%= product._id %>" class="btn btn-primary">Edit</a></td>
+                              <td>
+                                  <form id="deleteForm" action="/admin/delete-products/<%= product._id %>/delete" method="POST">
+                                      <button type="submit" id="confirmDeleteButton" class="btn btn-danger">Delete</button>
+                                  </form>
+                              </td>
+                          </tr>
+                          <% }) %>
+                      </tbody>
+                  </table>
+  
+                  <!-- Offer Modal -->
+                  <style>
+                      .modal-dialog-custom {
+                          max-width: 30%;
+                          /* Adjust this value as needed */
+                      }
+                  </style>
+  
+                  <div class="modal fade" id="offerModal" tabindex="-1" role="dialog" aria-labelledby="offerModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-custom" role="document">
+                          <div class="modal-content">
+                              <div class="modal-header">
+                                  <h5 class="modal-title" id="offerModalLabel">Available Offers</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                  </button>
+                              </div>
+                              <div class="modal-body">
+                                  <div id="offerList">
+                                      <% offers.forEach(offer => { %>
+                                      <div class="card mb-3">
+                                          <div class="card-body">
+                                              <h5 class="card-title"><%= offer.name %> (<%= offer.percentage %>% Off)</h5>
+                                              <p class="card-text">Valid from <%= offer.startDate %> to <%= offer.endDate %></p>
+                                              <button class="btn btn-primary select-offer" data-offer-id="<%= offer._id %>">Select Offer</button>
+                                          </div>
+                                      </div>
+                                      <% }) %>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                   <nav aria-label="Page navigation">
+                     <ul class="pagination justify-content-center">
+                        <% if (currentPage > 1) { %>
+                          <li class="page-item">
+                             <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                               <span aria-hidden="true">&laquo;</span>
+                            </a>
+                         </li>
+                        <% } %>
+
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                         <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                         <% } %>
+
+                           <% if (currentPage < totalPages) { %>
+                            <li class="page-item">
+                              <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                             </a>
+                            </li>
+                           <% } %>
+                      </ul>
+                   </nav>
             </div>
-            
-              
-            <script>
-              document.addEventListener('DOMContentLoaded', function () {
-                  const applyOfferButtons = document.querySelectorAll('.apply-offer');
-          
-                  applyOfferButtons.forEach(button => {
-                      button.addEventListener('click', function () {
-                          const productId = this.getAttribute('data-product-id');
-                          $('#offerModal').modal('show');
-          
-                          const selectOfferButtons = document.querySelectorAll('.select-offer');
-          
-                          selectOfferButtons.forEach(selectButton => {
-                              selectButton.addEventListener('click', function () {
-                                  const offerId = this.getAttribute('data-offer-id');
-                                  const offerName = this.parentElement.querySelector('.card-title').innerText;
-          
-                                  Swal.fire({
-                                      title: 'Apply Offer',
-                                      text: `Are you sure you want to apply "${offerName}" to this product?`,
-                                      icon: 'question',
-                                      showCancelButton: true,
-                                      confirmButtonText: 'Apply',
-                                      cancelButtonText: 'Cancel'
-                                  }).then((result) => {
-                                      if (result.isConfirmed) {
-                                          applyOffer(productId, offerId);
-                                      }
+
+
+            <style>
+           
+.pagination {
+    border-radius: 0.25rem; 
+}
+
+.page-item.active .page-link {
+    background-color: #007bff; 
+    border-color: #007bff; 
+    color: white; 
+}
+
+.page-link {
+    border: 1px solid #dee2e6; 
+    border-radius: 0.25rem; 
+    padding: 0.5rem 0.75rem; 
+}
+
+.page-link:hover {
+    background-color: #e9ecef; /* Background color on hover */
+}
+
+            </style>
+  
+                  <script>
+                      document.addEventListener('DOMContentLoaded', function() {
+                          const applyOfferButtons = document.querySelectorAll('.apply-offer');
+  
+                          applyOfferButtons.forEach(button => {
+                              button.addEventListener('click', function() {
+                                  const productId = this.getAttribute('data-product-id');
+                                  $('#offerModal').modal('show');
+  
+                                  const selectOfferButtons = document.querySelectorAll('.select-offer');
+  
+                                  selectOfferButtons.forEach(selectButton => {
+                                      selectButton.addEventListener('click', function() {
+                                          const offerId = this.getAttribute('data-offer-id');
+                                          const offerName = this.parentElement.querySelector('.card-title').innerText;
+  
+                                          Swal.fire({
+                                              title: 'Apply Offer',
+                                              text: `Are you sure you want to apply "${offerName}" to this product?`,
+                                              icon: 'question',
+                                              showCancelButton: true,
+                                              confirmButtonText: 'Apply',
+                                              cancelButtonText: 'Cancel'
+                                          }).then((result) => {
+                                              if (result.isConfirmed) {
+                                                  applyOffer(productId, offerId);
+                                              }
+                                          });
+                                      });
                                   });
                               });
                           });
+  
+                          function applyOffer(productId, offerId) {
+                              axios.post(`/admin/applyOffer/${productId}`, {
+                                      offerId
+                                  })
+                                  .then(response => {
+                                      Swal.fire({
+                                          title: 'Success!',
+                                          text: response.data.message,
+                                          icon: 'success',
+                                          confirmButtonText: 'OK'
+                                      }).then(() => {
+                                          window.location.href = '/admin/allProduct'; // Redirect to the all products page
+                                      });
+                                  })
+                                  .catch(error => {
+                                      Swal.fire({
+                                          title: 'Error!',
+                                          text: error.response.data.error || 'Failed to apply offer.',
+                                          icon: 'error',
+                                          confirmButtonText: 'OK'
+                                      });
+                                  });
+                          }
                       });
-                  });
-          
-                  function applyOffer(productId, offerId) {
-                      axios.post(`/admin/applyOffer/${productId}`, { offerId })
-                          .then(response => {
-                              Swal.fire({
-                                  title: 'Success!',
-                                  text: response.data.message,
-                                  icon: 'success',
-                                  confirmButtonText: 'OK'
-                              }).then(() => {
-                                  window.location.href = '/admin/allProduct'; // Redirect to the all products page
-                              });
-                          })
-                          .catch(error => {
-                              Swal.fire({
-                                  title: 'Error!',
-                                  text: error.response.data.error || 'Failed to apply offer.',
-                                  icon: 'error',
-                                  confirmButtonText: 'OK'
-                              });
-                          });
-                  }
-              });
-          </script>
-          
-              
-            
-                  
+                  </script>
+  
               </div>
           </div>
       </div>
   </div>
+  
 
 
 

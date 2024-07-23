@@ -311,25 +311,7 @@
         <div class="mb-6"></div><!-- End .mb-6 -->
 
         <div class="container">
-            <div class="heading heading-center mb-3">
-                <h2 class="title">Top Selling Products</h2><!-- End .title -->
-
-                <ul class="nav nav-pills nav-border-anim justify-content-center" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="top-all-link" data-toggle="tab" href="#top-all-tab" role="tab" aria-controls="top-all-tab" aria-selected="true">All</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="top-fur-link" data-toggle="tab" href="#top-fur-tab" role="tab" aria-controls="top-fur-tab" aria-selected="false">Furniture</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="top-decor-link" data-toggle="tab" href="#top-decor-tab" role="tab" aria-controls="top-decor-tab" aria-selected="false">Decoration</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="top-light-link" data-toggle="tab" href="#top-light-tab" role="tab" aria-controls="top-light-tab" aria-selected="false">Lighting</a>
-                    </li>
-                </ul>
-            </div><!-- End .heading -->
-
+        
             <div class="tab-content">
                 <div class="tab-pane p-0 fade show active" id="top-all-tab" role="tabpanel" aria-labelledby="top-all-link">
                     <div class="products">
@@ -338,33 +320,31 @@
                                 <div class="col-6 col-md-4 col-lg-3 col-xl-5col">
                                     <div class="product product-11 text-center">
                                         <figure class="product-media">
-                                            <a href="product.html">
+                                            <a href="/singleProduct?productId=<%= product._id %>">
                                                 <img src="<%= product.product_image[0].resizedFile %>" alt="Product image">
-                                                <img src="<%= product.product_image[1].resizedFile %>" alt="Product image" class="product-image-hover">
+                                                <% if (product.product_image[1]) { %>
+                                                    <img src="<%= product.product_image[1].resizedFile %>" alt="Product image" class="product-image-hover">
+                                                <% } %>
                                             </a>
-                                            <div class="product-action-vertical">
-                                                <a href="#" class="btn-product-icon btn-wishlist"><span>add to wishlist</span></a>
-                                            </div><!-- End .product-action-vertical -->
+                                           
                                         </figure><!-- End .product-media -->
-                        
+                    
                                         <div class="product-body">
-                                            <div class="product-cat">
-                                                <a href="#"><%= product.productName %></a>
-                                            </div><!-- End .product-cat -->
-                                            <h3 class="product-title"><a href="product.html"></a></h3><!-- End .product-title -->
+                                            <h3 class="product-title"><a href="/singleProduct?productId=<%= product._id %>"><%= product.productName %></a></h3>
+                                            <h2 class="product-title"><%= product.brand %></h3>
                                             <div class="product-price">
-                                                <%= product.price %>
+                                                ₹<%= product.price %>
                                             </div><!-- End .product-price -->
                                         </div><!-- End .product-body -->
                                         <div class="product-action">
-                                            <a href="" class="btn-product btn-cart"><span>add to cart</span></a>
+                                            <a href="/cart" onclick="addToCart('<%= product._id %>')" class="btn-product btn-cart"><span>add to cart</span></a>
                                         </div><!-- End .product-action -->
                                     </div><!-- End .product -->
                                 </div><!-- End .col-sm-6 col-md-4 col-lg-3 -->
                             <% }) %>
-                        </div><!-- End .row -->
-                        
+                        </div><!-- End .row -->   
                     </div><!-- End .products -->
+                    
                 </div><!-- .End .tab-pane -->
             </div><!-- End .tab-content -->
         </div><!-- End .container -->
@@ -593,6 +573,42 @@
 </div><!-- End .mobile-menu-container -->
 
 <!-- --------------- -->
+
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<script>
+     function addToCart(productId) {
+            const data = { productId: productId };
+            axios.post('/addtoCart', data)
+                .then(response => {
+                    console.log(response);
+        
+                    // Show a sweet alert after logging the response
+                    swal("Success", "Product added to cart!", "success");
+                })
+                .catch(error => {
+                    console.error(error);
+        
+                    // Check the error response and show appropriate sweet alert
+                    if (error.response) {
+                        if (error.response.status === 400 && error.response.data.message === 'Product out of stock') {
+                            swal("Error", "Product out of stock", "error");
+                        } else if (error.response.status === 404 && error.response.data.message === 'Product not found') {
+                            swal("Error", "Product not found", "error");
+                        } else if (error.response.status === 401 && error.response.data.message === 'User not authenticated') {
+                            swal("Error", "User not authenticated", "error");
+                        } else {
+                            swal("Error", "Something went wrong!", "error");
+                        }
+                    } else {
+                        swal("Error", "Something went wrong!", "error");
+                    }
+                });
+        }
+
+</script>
 
 
 <%- include('../layouts/footer.ejs') -%>

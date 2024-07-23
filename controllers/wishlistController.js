@@ -35,23 +35,24 @@ const addToWishlist = async (req, res) => {
 };
 
 const getUserWishlist = async (req, res) => {
-    const {user_id} = req.session;
-    if(!user_id){
-        return res.render('404');
+    const { user_id } = req.session;
+    if (!user_id) {
+        return res.redirect('login');
     }
-  try {
-      const wishlist = await Wishlist.findOne({ user: user_id }).populate('products.productId');
+    try {
+        const wishlist = await Wishlist.findOne({ user: user_id }).populate('products.productId');
 
-       // Filter out products with null productId
-       if (wishlist && wishlist.products) {
-        wishlist.products = wishlist.products.filter(product => product.productId !== null);
+        if (wishlist && wishlist.products) {
+            wishlist.products = wishlist.products.filter(product => product.productId !== null);
+        }
+        
+        res.render('wishlist', { wishlist });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
     }
-    
-      res.render('wishlist',{wishlist})
-  } catch (error) {
-      console.log(error);
-  }
 };
+
 
 
 

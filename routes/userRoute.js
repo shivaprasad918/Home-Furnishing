@@ -5,6 +5,8 @@ const userController = require('../controllers/userController');
 const productController = require('../controllers/productController');
 const cartController = require('../controllers/cartController');
 const auth = require("../middleware/userAuth");
+const pdf = require('html-pdf');
+const ejs = require('ejs');
 const orderController = require('../controllers/orderController');
 const wishlistController = require('../controllers/wishlistController');
 const couponController = require('../controllers/couponController')
@@ -29,6 +31,11 @@ user_route.post('/verify/:id',auth.isLogin, auth.isBlocked, userController.verif
 user_route.post('/resend-otp',auth.isLogin, auth.isBlocked, userController.resendOtp);
 
 user_route.get('/logout', auth.isLogin, auth.isBlocked, userController.userLogout);
+
+user_route.get('/resetPassMail', userController.resetPass);
+user_route.post('/reset-password', userController.resetPassword);
+user_route.get('/reset-password/:token', userController.verifyResetToken);
+user_route.post('/change-password/:token', userController.changePassword);
 
 
 user_route.get('/orderSuccessPage/:id',auth.isLogin, auth.isBlocked, orderController.loadSuccessPage);
@@ -74,6 +81,9 @@ user_route.post('/retryPayment', orderController.retryPayment);
 user_route.get('/orderDetailed/:orderId',auth.isLogin, auth.isBlocked, orderController.orderDetailed);
 user_route.post('/cancelOrder/:orderId', auth.isLogin, auth.isBlocked, orderController.cancelOrder);
 user_route.post('/return-order',auth.isLogin, auth.isBlocked, orderController.returnOrder);
+user_route.get('/order/:orderId/invoice',auth.isLogin, auth.isBlocked, orderController.downloadInvoice)
+user_route.get('/getInvoice/:orderId',auth.isLogin, auth.isBlocked, orderController.getInvoice)
+
 
 //apply coupon 
 

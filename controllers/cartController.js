@@ -85,17 +85,19 @@ const loadCart = async (req, res) => {
     try {
         const userId = req.session.user_id;
         
-        // Check if user is logged in
         if (!userId) {
-            return res.render('404');
+            return res.redirect('login');
         }
 
         const cart = await Cart.findOne({ userId: userId }).populate('product.productId');
 
-        
-        const cartItem = cart.product.filter(item => item.productId);
+        if (!cart) {
+            return res.render('cart', { cart: { product: [] }, subtotal: 0, grandTotal: 0 });
+        }
 
-        const subtotal = cartItem.reduce((sum, item) => sum + item.total, 0);
+        const cartItems = cart.product.filter(item => item.productId);
+
+        const subtotal = cartItems.reduce((sum, item) => sum + item.total, 0);
         const grandTotal = subtotal; 
 
         res.render('cart', { cart, subtotal, grandTotal });
@@ -104,6 +106,7 @@ const loadCart = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
 
@@ -176,7 +179,7 @@ const loadCheckout = async (req, res) => {
         const userId = req.session.user_id;
         const cart = await Cart.findOne({ userId: userId });
         if (!cart) {
-            return res.status(404).json({ error: 'Cart not found' });
+            return res.redirect('allproducts');
         }
 
         if (cart.product.length === 0) {
@@ -197,7 +200,6 @@ const loadCheckout = async (req, res) => {
                     price = product.price;
                 }
                 const productTotal = item.quantity * price;
-                // const productTotal = ((product.price * product.quantity) - ((product.price * product.couponDiscount) / 100)).toFixed()
                 products.push({
                     name: product.productName,
                     price: price,
@@ -210,12 +212,12 @@ const loadCheckout = async (req, res) => {
             }
         }
 
-        const grandTotal = subtotal; // Adjust if there are additional calculations for grand total
+        const grandTotal = subtotal;
 
         const user = await User.findById(userId);
         const address = user ? user.address : null;
 
-        // Fetch coupons and filter them based on the minimum purchase amount
+       
         let coupons = await Coupon.find();
         coupons = coupons.filter(coupon => coupon.minPurchaseAmount <= subtotal);
 
@@ -225,10 +227,6 @@ const loadCheckout = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
-
-
-
 
 
 
@@ -245,9 +243,9 @@ const loadAddressFormCheck = async(req,res)=>{
     }
 }
 
-const addAddressCheck = async(req,res)=>{
+const addAddressCheck = async (req, res) => {
     try {
-        const userId =  req.session.user_id; 
+        const userId = req.session.user_id;
         const { name, phone, buildingName, city, district, state, postcode } = req.body;
 
         const user = await User.findById(userId);
@@ -255,6 +253,21 @@ const addAddressCheck = async(req,res)=>{
             return res.status(404).send('User is not found');
         }
 
+        const addressExists = user.address.some(addr =>
+            addr.name === name &&
+            addr.phone === phone &&
+            addr.buildingName === buildingName &&
+            addr.city === city &&
+            addr.district === district &&
+            addr.state === state &&
+            addr.postcode === postcode
+        );
+
+        if (addressExists) {
+            return res.status(400).send('Address is already used');
+        }
+
+      
         const newAddress = {
             name,
             phone,
@@ -266,17 +279,15 @@ const addAddressCheck = async(req,res)=>{
         };
 
         user.address.push(newAddress);
-        
-    
         await user.save();
 
-        
-        res.redirect('/checkout')
+        res.redirect('/checkout');
     } catch (error) {
         console.log(error);
-        res.status(404).send('User is Not Found')
+        res.status(500).send('Server Error');
     }
-}
+};
+
 
 const deleteAddressCheck = async (req, res) => {
     try {
@@ -288,28 +299,22 @@ const deleteAddressCheck = async (req, res) => {
             return res.status(400).json({ error: 'Missing user ID or address ID' });
         }
 
-        // Update user by pulling the address with the given address ID
         const updateUser = await User.findOneAndUpdate(
             { _id: userId },
             { $pull: { address: { _id: addressId } } },
             { new: true }
         );
 
-        // Check if user is found
         if (!updateUser) {
             return res.status(404).json({ error: 'User is not found' });
         }
 
-        // Respond with success status and message
         res.status(200).json({ message: 'Address deleted successfully' });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-
-
-
 
 
 

@@ -3,6 +3,9 @@ const express = require('express');
 const path = require('path');
 const nocache = require('nocache');
 const session = require('express-session');
+const googleAuth = require('./googleAuth');
+const userRoute = require('./routes/userRoute');
+const adminRoute = require('./routes/adminRoute');
 const config = require('./config/config');
 require('./config/mongoConfig');
 
@@ -18,13 +21,12 @@ app.use(session({
   saveUninitialized: true,
 }));
 
-const userRoute = require('./routes/userRoute');
-const adminRoute = require('./routes/adminRoute');
-const googleAuth = require('./googleAuth');
 
+
+app.use('/', googleAuth);
 app.use('/admin', adminRoute);
 app.use('/', userRoute);
-app.use('/', googleAuth);
+
 
 
 app.listen(config.port, () => {

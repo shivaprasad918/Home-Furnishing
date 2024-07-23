@@ -1,13 +1,15 @@
+
 const Order = require('../model/orderSchema');
 const Cart = require('../model/Cart');
 const Coupon = require('../model/couponSchema')
 const User = require('../model/userModel');
 const Product = require('../model/product');
+const path = require('path');
 const mongoose = require('mongoose');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
-
+const puppeteer = require("puppeteer")
 const razorpayInstance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_SECRET_KEY
@@ -65,14 +67,16 @@ const placeOrder = async (req, res) => {
             }
 
             return {
-                product: cartProduct.productId,
+                product: cartProduct.productId._id,
                 name: cartProduct.productId.productName,
                 price: cartProduct.price,
                 quantity: cartProduct.quantity,
                 total: total, // Ensure total is valid
                 image: cartProduct.productId.product_image[0].resizedFile,
                 couponDiscount: discount !== cartProduct.price ? discount : 0,
-                status: 'pending'
+                status: 'pending',
+                category: cartProduct.productId.category,
+                brand: cartProduct.productId.brand
             };
         });
 
@@ -85,11 +89,11 @@ const placeOrder = async (req, res) => {
             address: selectedAddress,
             orderId: uniqueOrderId,
             status: 'pending',
-            paymentStatus:"started",
+            paymentStatus: 'pending',
             paymentMethod: paymentMethod,
             coupon: coupon ? coupon._id : null,
             couponName: coupon ? coupon.couponName : '',
-            discount: coupon ? coupon.discount : 0 // Assuming you want to store the discount
+            discount: coupon ? coupon.discount : 0
         });
 
         await order.save();
@@ -98,7 +102,7 @@ const placeOrder = async (req, res) => {
             await Cart.findOneAndUpdate({ userId }, { product: [], grandTotal: 0 });
             return res.status(200).json({ message: 'Order placed successfully', order });
         } else if (paymentMethod === 'wallet') {
-            // Write the wallet payment code here
+            // Implement wallet payment logic here
         } else if (paymentMethod === 'razorpay') {
             try {
                 const razorpayOrder = await generateRazorpay(uniqueOrderId, totalPrice);
@@ -113,6 +117,7 @@ const placeOrder = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 };
+
 
 
 
@@ -220,7 +225,6 @@ const cancelOrder = async (req, res) => {
     const { orderId } = req.params;
 
     try {
-        console.log("working---------------")
         const order = await Order.findById(orderId);
 
         if (!order) {
@@ -256,13 +260,11 @@ const returnOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        // Find the specific product in the order by productId
         const product = order.products.find(prod => prod._id.toString() === productId);
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found in order' });
         }
 
-        // Update product status
         product.status = 'return-requested';
         product.returnReason = reason;
 
@@ -276,19 +278,90 @@ const returnOrder = async (req, res) => {
 };
 
 
+const downloadInvoice = async(req,res)=>{
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findById(orderId).populate('User').exec();
+        
+
+        // if (!order) {
+        //     return res.status(404).send('Order not found');
+        // }
+
+        // const templatePath = path.join(__dirname, '../views/invoice.ejs');
+        // const html = await ejs.renderFile(templatePath, { order });
+
+        // const options = { format: 'A4' };
+        // pdf.create(html, options).toStream((err, stream) => {
+        //     if (err) return res.status(500).send(err);
+        //     res.setHeader('Content-Type', 'application/pdf');
+        //     res.setHeader('Content-Disposition', `attachment; filename=invoice-${order._id}.pdf`);
+        //     stream.pipe(res);
+        // });
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        const invoiceUrl = `http://localhost:3005/getInvoice/${orderId}`;
+
+        await page.goto(invoiceUrl, { waitUntil: 'networkidle2' });
+        const pdf = await page.pdf({ format: 'A4' });
+    
+        await browser.close();
+    
+        res.set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'attachment; filename="hn.pdf"',
+        });
+    
+        res.send(pdf);
+       
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}
+
+
+const getInvoice =async(req,res)=>{
+    try {
+        const{orderId} = req.params
+        const order = await Order.findById(orderId).populate('User').exec();
+
+        res.render('invoice',{order})
+    } catch (error) {
+        
+    }
+}
+
 
 //admin side
 
 
 const getOrder = async (req, res) => {
     try {
-        const orders = await Order.find().populate('User').populate('products');
+        const orders = await Order.find({paymentStatus:{$ne:'failed'}}).populate('User').populate('products');
         res.render('order', { orders });
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).send('Error fetching orders');
     }
 };
+
+const getOrderDetails = async(req,res)=>{
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findById(orderId)
+            .populate('User')
+            .populate('products.product')
+            .populate('coupon');
+        
+        res.render('adminOrderDetailed', { order });
+    } catch (error) {
+        console.error('Error fetching order details:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
+
+
 
 const updateOrderAndProductStatus = async (req, res) => {
     const { orderId, productId, status } = req.body;
@@ -304,7 +377,6 @@ const updateOrderAndProductStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        // Check if payment is failed
         if (order.paymentStatus === 'failed') {
             return res.status(403).json({ success: false, message: 'Cannot update status. Payment failed.' });
         }
@@ -315,8 +387,20 @@ const updateOrderAndProductStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found in order' });
         }
 
-        // Update product status
         productToUpdate.status = status;
+
+        const deliveredCount = order.products.filter(p => p.status === 'delivered').length;
+
+        if (order.paymentMethod.toLowerCase() === 'cash on delivery') {
+            if (deliveredCount === order.products.length) {
+                order.paymentStatus = 'Paid';
+            } else if (deliveredCount > 0) {
+                order.paymentStatus = `${deliveredCount} Paid`;
+            } else {
+                order.paymentStatus = 'Pending';
+            }
+        }
+
         await order.save();
 
         res.json({ success: true, message: 'Product status updated successfully', product: productToUpdate });
@@ -325,6 +409,8 @@ const updateOrderAndProductStatus = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to update product status' });
     }
 };
+
+
 
 
 const getReturnReason = async (req, res) => {
@@ -378,7 +464,7 @@ const acceptReturn = async (req, res) => {
 };
 
 const rejectReturn = async (req, res) => {
-    const { orderId, productId } = req.body;
+    const { orderId, productId, reason } = req.body;
 
     try {
         const order = await Order.findById(orderId);
@@ -392,10 +478,10 @@ const rejectReturn = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found in order' });
         }
 
-        productToUpdate.status = 'delivered';
-        productToUpdate.returnReason = '';
+        productToUpdate.status = 'rejected';
+        productToUpdate.rejectReason = reason;
 
-        // Save the updated order
+       
         await order.save();
 
         res.json({ success: true });
@@ -411,10 +497,13 @@ module.exports = {
     orderDetailed,
     cancelOrder,
     returnOrder,
+    downloadInvoice,
+    getInvoice,
     razorpayverifyPayment,
     razorpayfailure,
     loadSuccessPage,
     getOrder,
+    getOrderDetails,
     updateOrderAndProductStatus,
     getReturnReason,
     acceptReturn,

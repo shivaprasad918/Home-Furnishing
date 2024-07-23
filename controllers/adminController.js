@@ -1,9 +1,9 @@
-
-
 const bcrypt = require('bcrypt');
 const User = require('../model/userModel');
 const config = require("../config/config");
 const Order = require('../model/orderSchema');
+const Category = require('../model/category');
+const Product = require('../model/product');
 const ExcelJS = require('exceljs');
 
 const securePassword = async (password) => {
@@ -15,14 +15,87 @@ const securePassword = async (password) => {
     }
 };
 
-const loadDashboard =async (req, res) => {
+
+const loadDashboard = async (req, res) => {
     try {
-        res.render('dashboard',);
+        // Aggregate to get top 10 best-selling products
+        const topProducts = await Order.aggregate([
+            { $unwind: "$products" },
+            {
+                $group: {
+                    _id: "$products.product",
+                    totalSold: { $sum: "$products.quantity" }
+                }
+            },
+            { $sort: { totalSold: -1 } },
+            { $limit: 10 },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'product'
+                }
+            },
+            { $unwind: "$product" }
+        ]);
+
+        // Aggregate to get top 10 best-selling subcategories
+        const topSubcategories = await Order.aggregate([
+            { $unwind: "$products" },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'products.category',
+                    foreignField: '_id',
+                    as: 'categoryDetails'
+                }
+            },
+            { $unwind: "$categoryDetails" },
+            {
+                $group: {
+                    _id: "$categoryDetails.subCategory",
+                    totalSold: { $sum: "$products.quantity" }
+                }
+            },
+            { $sort: { totalSold: -1 } },
+            { $limit: 10 },
+            {
+                $project: {
+                    _id: 0,
+                    subcategoryName: "$_id",
+                    totalSold: 1
+                }
+            }
+        ]);
+
+        // Aggregate to get top 10 best-selling brands
+        const topBrands = await Order.aggregate([
+            { $unwind: "$products" },
+            {
+                $group: {
+                    _id: "$products.brand",
+                    totalSold: { $sum: "$products.quantity" }
+                }
+            },
+            { $sort: { totalSold: -1 } },
+            { $limit: 10 }
+        ]);
+
+        res.render('dashboard', { topProducts, topSubcategories, topBrands });
     } catch (error) {
         console.error('Error loading dashboard:', error);
         res.status(500).send('Internal Server Error');
     }
 };
+
+
+
+
+
+
+
+
 
 
 
@@ -65,7 +138,7 @@ const adminLogout = async (req, res) => {
 
 const loadUser = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find({ is_verified: true });
         res.render('User', { user: users });
     } catch (error) {
         console.error('Error loading users:', error);
@@ -75,13 +148,13 @@ const loadUser = async (req, res) => {
 
 const updateUserStatus = async (req, res) => {
     try {
-        const {userId } = req.params;
+        const { userId } = req.params;
         const user = await User.findById(userId);
 
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-      
+
         if (user.is_block === 'active') {
             user.is_block = 'blocked';
         } else if (user.is_block === 'blocked') {
@@ -141,8 +214,8 @@ const generateSalesReport = async (req, res) => {
                 $lte: calculatedEndDateTime,
             },
         })
-        .populate('User')
-        .sort({ createdAt: 1 });
+            .populate('User')
+            .sort({ createdAt: 1 });
 
         res.json({ orders });
 
@@ -197,7 +270,7 @@ const downloadSalesReport = async (req, res) => {
     }
 };
 
-const admin404Error = async(req,res)=>{
+const admin404Error = async (req, res) => {
     try {
         res.render('404-admin')
     } catch (error) {
@@ -209,87 +282,87 @@ const admin404Error = async(req,res)=>{
 
 const chartYear = async (req, res, next) => {
     try {
-      const curntYear = new Date().getFullYear();
-  
-      const yearChart = await Order.aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: new Date(`${curntYear - 5}-01-01`),
-              $lte: new Date(`${curntYear}-12-31`),
+        const curntYear = new Date().getFullYear();
+
+        const yearChart = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: {
+                        $gte: new Date(`${curntYear - 5}-01-01`),
+                        $lte: new Date(`${curntYear}-12-31`),
+                    },
+                },
             },
-          },
-        },
-        {
-          $group: {
-            _id: { $year: "$createdAt" },
-            totalAmount: { $sum: "$totalPrice" }, // Make sure to use the correct field name
-          },
-        },
-        {
-          $sort: { _id: 1 },
-        },
-      ]);
-  
-      res.send({ yearChart });
+            {
+                $group: {
+                    _id: { $year: "$createdAt" },
+                    totalAmount: { $sum: "$totalPrice" },
+                },
+            },
+            {
+                $sort: { _id: 1 },
+            },
+        ]);
+
+        res.send({ yearChart });
     } catch (error) {
-      next(error);
+        next(error);
     }
-  };
-  
-  
+};
+
+
 //  Month Chart (Put Method) :-
-  
+
 const monthChart = async (req, res, next) => {
     try {
-      const monthName = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
-  
-      const curntYear = new Date().getFullYear();
-  
-      const monData = await Order.aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: new Date(`${curntYear}-01-01`),
-              $lte: new Date(`${curntYear}-12-31`),
+        const monthName = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ];
+
+        const curntYear = new Date().getFullYear();
+
+        const monData = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: {
+                        $gte: new Date(`${curntYear}-01-01`),
+                        $lte: new Date(`${curntYear}-12-31`),
+                    },
+                },
             },
-          },
-        },
-        {
-          $group: {
-            _id: { $month: "$createdAt" },
-            totalAmount: { $sum: "$totalPrice" }, // Ensure this field matches your schema
-          },
-        },
-        {
-          $sort: { _id: 1 },
-        },
-      ]);
-  
-      const salesData = Array.from({ length: 12 }, (_, i) => {
-        const monthData = monData.find((item) => item._id === i + 1);
-        return monthData ? monthData.totalAmount : 0;
-      });
-  
-      res.json({ months: monthName, salesData });
+            {
+                $group: {
+                    _id: { $month: "$createdAt" },
+                    totalAmount: { $sum: "$totalPrice" }, // Ensure this field matches your schema
+                },
+            },
+            {
+                $sort: { _id: 1 },
+            },
+        ]);
+
+        const salesData = Array.from({ length: 12 }, (_, i) => {
+            const monthData = monData.find((item) => item._id === i + 1);
+            return monthData ? monthData.totalAmount : 0;
+        });
+
+        res.json({ months: monthName, salesData });
     } catch (error) {
-      next(error);
+        next(error);
     }
-  };
-  
+};
+
 
 
 module.exports = {

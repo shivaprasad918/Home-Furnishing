@@ -1,4 +1,3 @@
-// googleAuth.js
 const express = require('express');
 const axios = require('axios');
 const User = require('./model/userModel');
@@ -6,57 +5,56 @@ require('dotenv').config();
 
 const router = express.Router();
 
-const googleClientID=process.env.GOOGLE_CLIENT_ID
-const googleClientSecret=process.env.GOOGLE_CLIENT_SECRET
-const REDIRECT_URI = process.env.REDIRECT_URI;
+const googleClientID = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const redirectUri = process.env.REDIRECT_URI;
 
 // Initiates the Google Login flow
 router.get('/auth/google', (req, res) => {
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=profile email`;
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientID}&redirect_uri=${redirectUri}&response_type=code&scope=profile email`;
   res.redirect(url);
 });
 
 // Callback URL for handling the Google Login response
 router.get('/auth/google/callback', async (req, res) => {
-  const { code } = req.query;
+  const code = req.query.code;
 
   try {
     // Exchange authorization code for access token
-    const { data } = await axios.post('https://oauth2.googleapis.com/token', {
-      client_id: googleClientID,
-      client_secret: googleClientSecret,
-      code,
-      redirect_uri: REDIRECT_URI,
-      grant_type: 'authorization_code',
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', null, {
+      params: {
+        client_id: googleClientID,
+        client_secret: googleClientSecret,
+        code: code,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      },
     });
 
-    const { access_token, id_token } = data;
+    const accessToken = data.access_token;
 
-    // Use access_token or id_token to fetch user profile
     const { data: profile } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
-      headers: { Authorization: `Bearer ${access_token}` },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
 
-    console.log(profile);
+    // Check if user already exists in database
+    let user = await User.findOne({ email: profile.email });
 
-    const findUser = await User.findOne({ email: profile.email }).catch(error => {
-      console.error('Error finding user:', error);
-    });
-
-    if (findUser) {
-      req.session.user_id = findUser._id;
-      console.log("User logged in");
-    } else {
-      const newUser = new User({
+    if (!user) {
+      user = new User({
         name: profile.name,
         email: profile.email,
         password: profile.id,
       });
 
-      await newUser.save();
-      req.session.user_id = newUser._id;
+      await user.save();
     }
 
+    req.session.user_id = user._id;
+
+ 
     res.redirect('/');
   } catch (error) {
     console.error('Error:', error.response);

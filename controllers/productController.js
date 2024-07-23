@@ -8,18 +8,30 @@ const path = require("path");
 
 
 
-const loadAddProduct = async(req,res)=>{
+const loadAddProduct = async (req, res) => {
     try {
-        res.render('addProduct')
+        const categories = await Category.find({ is_block: false, is_delete: false });
+
+        const uniqueCategories = [];
+        const map = new Map();
+        for (const category of categories) {
+            if (!map.has(category.categoryName)) {
+                map.set(category.categoryName, true);   
+                uniqueCategories.push(category);
+            }
+        }
+        
+        res.render('addProduct', { categories: uniqueCategories });
     } catch (error) {
-        console.log(error);
+        console.error('Error fetching categories:', error);
+        res.status(500).send('Internal Server Error');
     }
-}
+};
 
 
 const addProduct = async (req, res) => {
     try {
-        const { productName, productPrice, quantity, mainCategory, subCategory, productDescription } = req.body;
+        const { productName, productPrice, quantity, mainCategory, subCategory, productDescription, brand } = req.body;
 
         // Find the subcategory ID
         const find = await Category.findOne({ categoryName: mainCategory, subCategory: subCategory });
@@ -32,40 +44,33 @@ const addProduct = async (req, res) => {
         // Process images
         const processedImages = await Promise.all(req.files.map(async (file) => {
             try {
-                console.log("process image:", file.filename);
                 const resizedFilename = `resized-${file.filename}`;
                 const inputFilePath = path.join(__dirname, '../public/upload', file.filename);
                 const resizedPath = path.join(__dirname, '../public/upload', resizedFilename);
                 await sharp(inputFilePath)
                     .resize({ height: 600, width: 650, fit: 'fill' })
                     .toFile(resizedPath);
-                console.log("image upload successfully:", file.filename);
-                
+
                 return {
                     filename: file.filename,
                     path: `/upload/${file.filename}`, 
                     resizedFile: `/upload/${resizedFilename}`
                 };
             } catch (error) {
-                console.log("Error processing image:", error);
                 throw error;
             }
         }));
 
-
-
-
-        
         const newProduct = new Product({
             productName: productName,
             category: subCategory_id,
             price: productPrice,
             quantity: quantity,
             description: productDescription,
+            brand: brand,
             product_image: processedImages,
         });
 
-     
         await newProduct.save();
 
         res.redirect('/admin/allProduct');
@@ -75,6 +80,7 @@ const addProduct = async (req, res) => {
     }
 };
 
+
  
 
 
@@ -82,15 +88,13 @@ const addProduct = async (req, res) => {
 const getSubcategories = async (req, res) => {
     const { selectedOption } = req.body;
     try {
-        // Find the category based on the selected option
-        const category = await Category.find({ categoryName: selectedOption }).select('subCategory');
+        const category = await Category.find({ categoryName: selectedOption })
+        console.log(category,"fetching ");
     
         if (!category) {
             return res.status(404).json({ error: 'Category not found' });
         }
 
-        // Extract subcategories from the category object
-        // Send subcategories as response
         res.json({ category });
     } catch (error) {
         console.error('Error fetching subcategories:', error);
@@ -104,14 +108,36 @@ const getSubcategories = async (req, res) => {
 
 const loadAllProduct = async (req, res) => {
     try {
-        const products = await Product.find({ isDeleted: false }).populate('category');
-        const offers = await Offer.find({ status: true }); 
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 8; 
 
-        res.render('allProduct', { products, offers });
+        const skip = (page - 1) * limit;
+
+        const products = await Product.find({ isDeleted: false })
+            .skip(skip)
+            .limit(limit)
+            .populate({
+                path: 'category',
+                model: 'Category'
+            });
+
+        const totalProducts = await Product.countDocuments({ isDeleted: false });
+
+        const offers = await Offer.find({ status: true });
+
+        res.render('allProduct', { 
+            products, 
+            offers,
+            currentPage: page,
+            totalPages: Math.ceil(totalProducts / limit)
+        });
     } catch (error) {
         console.log(error);
+        res.status(500).send('Internal Server Error');
     }
 };
+
+
 
 
 //---------soft delete products--------
@@ -139,12 +165,9 @@ const softDeleteProducts = async (req, res) => {
 
 const renderEditProductPage = async (req, res) => {
     try {
-
-        console.log('edit product page ---------------------')
         const productId = req.params.productId;
         console.log(`Fetching product with ID: ${productId}`); // Debugging line
 
-        // Fetch the product from the database using the ID
         const product = await Product.findById(productId).populate('category');
         
         if (!product) {
@@ -152,15 +175,13 @@ const renderEditProductPage = async (req, res) => {
             return res.status(404).send({ error: "Product not found" });
         }
 
-        // Fetch categories from the database
         const categories = await Category.distinct('categoryName', {
-            is_delete: false // Add any other conditions if needed
+            is_delete: false 
         });
-        
+
         console.log(categories);
         console.log(`Categories fetched: ${categories.length}`); // Debugging line
 
-        // Render the edit product form with product and categories data
         res.render('editProduct', { product, categories });
     } catch (error) {
         console.error("Error rendering edit product page:", error);
@@ -170,10 +191,11 @@ const renderEditProductPage = async (req, res) => {
 
 
 
+
 const editProduct = async (req, res) => {
     try {
         const productId = req.params.productId;
-        const { productName, productPrice, quantity, mainCategory, subCategory, productDescription } = req.body;
+        const { productName, productPrice, quantity, mainCategory, subCategory, productDescription, brand } = req.body;
 
         const find = await Category.findOne({ categoryName: mainCategory, subCategory: subCategory });
         if (!find) {
@@ -185,7 +207,8 @@ const editProduct = async (req, res) => {
             category: subCategory_id,
             price: productPrice,
             quantity,
-            description: productDescription
+            description: productDescription,
+            brand 
         };
 
         if (req.files && req.files.length > 0) {
@@ -203,7 +226,7 @@ const editProduct = async (req, res) => {
                     return {
                         filename: file.filename,
                         path: `/upload/${file.filename}`,
-                        resizedFile: `/upload/${resizedFilename}`
+                        resizedFile:` /upload/${resizedFilename}`
                     };
                 } catch (error) {
                     console.log("Error processing image:", error);
@@ -220,6 +243,7 @@ const editProduct = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+
 
 
 
@@ -263,7 +287,10 @@ const getProducts = async (req, res) => {
 
         const filter = { isDeleted: false };
 
-        // If a category filter is applied and it's not 'all', add it to the filter object
+        const allCategories = await Category.find({ is_block: false, is_delete: false });
+
+        const uniqueCategories = [...new Set(allCategories.map(cat => cat.categoryName))];
+
         if (category && category !== 'all') {
             const categoryObjs = await Category.find({
                 categoryName: category,
@@ -279,9 +306,8 @@ const getProducts = async (req, res) => {
             }
         }
 
-        // If a search query is provided, add it to the filter
         if (q) {
-            filter.productName = { $regex: q, $options: 'i' }; // Case-insensitive regex search
+            filter.productName = { $regex: q, $options: 'i' };
         }
 
         // Sort products based on the sort parameter
@@ -331,7 +357,8 @@ const getProducts = async (req, res) => {
             selectedCategory: category || 'all',
             searchTerm: q || '',
             queryParams: `&q=${q || ''}&sort=${sort || 'default'}&category=${category || 'all'}`,
-            noProducts: paginatedProducts.length === 0
+            noProducts: paginatedProducts.length === 0,
+            categories: uniqueCategories // Pass unique categories to the view
         });
 
     } catch (error) {
@@ -339,18 +366,6 @@ const getProducts = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -374,18 +389,14 @@ const getSingleProduct = async (req,res)=>{
 }
 
 const getProductAndRelated = async (req, res) => {
-    console.log('getProductAndRelated function called'); // Log at the start of the function
+    console.log('getProductAndRelated function called'); 
     try {
         const productId = req.params.id;
-        console.log('Product ID:', productId); // Log the product ID
         const product = await Product.findById(productId).populate('category').exec();
 
         if (!product) {
-            console.log('Product not found');
             return res.status(404).send('Product not found');
         }
-
-        console.log('Product:', product); // Log the fetched product
 
         const relatedProducts = await Product.find({
             _id: { $ne: productId },
@@ -393,7 +404,7 @@ const getProductAndRelated = async (req, res) => {
             isDeleted: false
         }).limit(4).exec();
 
-        console.log('Related Products:', relatedProducts); // Log the related products
+        console.log('Related Products:', relatedProducts); 
 
         res.render('users/singleProduct', { product: product, relatedProducts: relatedProducts });
     } catch (error) {
@@ -401,13 +412,6 @@ const getProductAndRelated = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 }
-
-
-
-
-
-
-
 
 
 
@@ -442,24 +446,6 @@ const applyOffer = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

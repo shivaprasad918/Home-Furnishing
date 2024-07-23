@@ -14,8 +14,12 @@ const orderSchema = new mongoose.Schema({
         total: { type: Number, required: true },
         image: { type: String },
         couponDiscount: { type: Number },
-        status: { type: String, enum: ['pending', 'shipped', 'delivered', 'cancelled', 'returned', 'return-requested'], default: 'pending' },
-        returnReason: { type: String } 
+        status: { type: String, enum: ['pending', 'shipped', 'delivered', 'cancelled', 'returned','rejected', 'return-requested'], default: 'pending' },
+        returnReason: { type: String },
+        rejectReason: { type: String },
+        refundProcessed: { type: Boolean, default: false },
+        category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+        brand: { type: String, required: true }
     }],
     totalPrice: {
         type: Number,

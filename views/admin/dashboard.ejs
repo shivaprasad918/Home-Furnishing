@@ -375,38 +375,121 @@
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
-            <div class="page-header">
-              <h3 class="page-title"> Chart </h3> 
-            </div>
-            <div class="row">
-              <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Month</h4>
-                    <canvas id="monthlyChart" style="height:250px" ></canvas>
-                  </div>
-                </div>
+              <div class="page-header">
+                  <h3 class="page-title">Dashboard</h3>
               </div>
-              <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Year</h4>
-                    <canvas id="areaChart" style="height:250px"></canvas>
-                  </div>
+              <div class="row">
+                <div class="col-lg-6 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Month</h4>
+                            <canvas id="monthlyChart" style="height:250px"></canvas>
+                        </div>
+                    </div>
                 </div>
-              </div>
+                <div class="col-lg-6 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Year</h4>
+                            <canvas id="areaChart" style="height:250px"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
+      
+              <div class="row mt-4">
+                <div class="col-lg-4 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Top 10 Best-Selling Products</h4>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product Name</th>
+                                        <th>Total Sold</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% topProducts.forEach((product, index) => { %>
+                                        <tr>
+                                            <td><%= index + 1 %></td>
+                                            <td><%= product.product.productName %></td>
+                                            <td><%= product.totalSold %></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 grid-margin stretch-card">
+                  <div class="card">
+                      <div class="card-body">
+                          <h4 class="card-title">Top 10 Best-Selling categories</h4>
+                          <table class="table table-striped">
+                              <thead>
+                                  <tr>
+                                      <th>#</th>
+                                      <th>Category Name</th>
+                                      <th>Total Sold</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <% topSubcategories.forEach((subcategory, index) => { %>
+                                      <tr>
+                                          <td><%= index + 1 %></td>
+                                          <td><%= subcategory.subcategoryName %></td>
+                                          <td><%= subcategory.totalSold %></td>
+                                      </tr>
+                                  <% }); %>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+              
+              
+              
+              
+              
+              
+              <div class="col-lg-4 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Top 10 Best-Selling Brands</h4>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Brand Name</th>
+                                    <th>Total Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% topBrands.forEach((brand, index) => { %>
+                                    <tr>
+                                        <td><%= index + 1 %></td>
+                                        <td><%= brand._id %></td> <!-- Brand name is stored in _id -->
+                                        <td><%= brand.totalSold %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            
           </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:../../partials/_footer.html -->
           <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com</span>
-            </div>
+              <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                  <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
+                  <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com</span>
+              </div>
           </footer>
-          <!-- partial -->
-        </div>
+      </div>
+      
         <!-- main-panel ends -->
       </div>
       <!-- page-body-wrapper ends -->
@@ -418,237 +501,157 @@
     <!-- chart script -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+      const currentYear = new Date().getFullYear();
+      const next5Years = Array.from({ length: 6 }, (_, index) => (currentYear+3) - index);
+      const previeYear = next5Years.reverse();
+      var date = [];
     
-    //  Year :-
-    
-    const currentYear = new Date().getFullYear();
-    const next5Years = Array.from({ length: 6 }, (_, index) => (currentYear+3) - index);
-    const previeYear = next5Years.reverse();
-    var date = [];
-    
-    fetch('/admin/chartYear', {
-    
-      method: 'put',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({})
-    
-    })
+      fetch('/admin/chartYear', {
+        method: 'put',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      })
         .then(res => res.json())
-    
         .then(data => {
-    
-    
-      previeYear.forEach((e, i) => {
-    
-        let yearFound = false;
-    
-        data.yearChart.forEach((year, ind) => {
-    
-          if (e === year._id) {
-    
-            date[i] = year.totalAmount;
-            yearFound = true;
-    
-          }
-    
-        });
-    
-        if (!yearFound) {
-    
-          date[i] = 0;
-    
-        }
-    
-      });
-    
-        if ($("#areaChart").length) {
-    
-          var areaData = {
-    
-            labels: previeYear,
-    
-            datasets: [{
-    
-              label: 'sales',
-              data: date,
-    
-              backgroundColor: [
-    
-                'rgba(54, 162, 235, 0.2)', 
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-              ],
-    
-              borderColor: [
-    
-                'rgba(54, 162, 235, 1)', 
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-    
-              ],
-    
-                borderWidth: 1,
-                fill: true,
-    
-            }]
-    
-          }; 
-    
-        var areaOptions = {
-    
-          plugins: {
-    
-            filler: {
-    
-              propagate: true
-    
+          previeYear.forEach((e, i) => {
+            let yearFound = false;
+            data.yearChart.forEach((year, ind) => {
+              if (e === year._id) {
+                date[i] = year.totalAmount;
+                yearFound = true;
+              }
+            });
+            if (!yearFound) {
+              date[i] = 0;
             }
-    
-          },
-    
-          scales: {
-    
-            yAxes: [{
-    
-              gridLines: {
-                color: "rgba(204, 204, 204,0.1)"
-              }
-    
-            }],
-    
-            xAxes: [{
-    
-              gridLines: {
-                color: "rgba(204, 204, 204,0.1)"
-              }
-    
-            }]
-    
-          }
-          
-        }
-    
-          var areaChartCanvas = $("#areaChart").get(0).getContext("2d");
-    
-          var areaChart = new Chart(areaChartCanvas, {
-    
-            type: 'line',
-            data: areaData,
-            options: areaOptions
-    
           });
     
-        }
+          if ($("#areaChart").length) {
+            var areaData = {
+              labels: previeYear,
+              datasets: [{
+                label: 'sales',
+                data: date,
+                backgroundColor: [
+                  'rgba(54, 162, 235, 0.2)', 
+                  'rgba(54, 162, 235, 0.2)',
+                  'rgba(255, 206, 86, 0.2)',
+                  'rgba(75, 192, 192, 0.2)',
+                  'rgba(153, 102, 255, 0.2)',
+                  'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                  'rgba(54, 162, 235, 1)', 
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1,
+                fill: true,
+              }]
+            }; 
     
-      //  Month :-
+            var areaOptions = {
+              plugins: {
+                filler: {
+                  propagate: true
+                }
+              },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    stepSize: 50000, // Set the step size to 50,000
+                  },
+                  gridLines: {
+                    color: "rgba(204, 204, 204,0.1)"
+                  }
+                }],
+                xAxes: [{
+                  gridLines: {
+                    color: "rgba(204, 204, 204,0.1)"
+                  }
+                }]
+              }
+            };
     
-        const monthName = [
+            var areaChartCanvas = $("#areaChart").get(0).getContext("2d");
+            var areaChart = new Chart(areaChartCanvas, {
+              type: 'line',
+              data: areaData,
+              options: areaOptions
+            });
+          }
     
-          "January", "February", "March",
-          "April", "May", "June", "July",
-          "August", "September", "October",
-          "November", "December"
-          
-        ];
+          // Month :-
+          const monthName = [
+            "January", "February", "March",
+            "April", "May", "June", "July",
+            "August", "September", "October",
+            "November", "December"
+          ];
     
-        fetch('/admin/monthChart', {
+          fetch('/admin/monthChart', {
+            method: 'put',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({})
+          })
+          .then(res => res.json())
+          .then(data => {
+            const months = monthName;
+            const salesData = data.salesData;
     
-          method: 'put',
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({})
-    
-        })
-    
-        .then(res => res.json())
-    
-        .then(data => {
-    
-          const months = monthName;
-          const salesData = data.salesData;
-    
-          if ($("#monthlyChart").length) {
-    
+            if ($("#monthlyChart").length) {
               var monthlyData = {
-    
                 labels: months,
-    
                 datasets: [{
-    
                   label: 'Sales',
                   data: salesData,
                   backgroundColor: 'rgba(54, 162, 235, 0.2)',
                   borderColor: 'rgba(54, 162, 235, 1)',
                   borderWidth: 1,
                   fill: true,
-    
                 }]
-    
               };
     
               var monthlyOptions = {
-    
                 plugins: {
-    
                   filler: {
-    
-                   propagate: true
-    
+                    propagate: true
                   }
-    
                 },
-    
                 scales: {
-    
                   yAxes: [{
-    
-                     gridLines: {
-    
-                      color: "rgba(204, 204, 204,0.1)"
-    
-                    }
-    
-                  }],
-                  
-                  xAxes: [{
-    
+                    ticks: {
+                      stepSize: 50000, // Set the step size to 50,000
+                    },
                     gridLines: {
-    
                       color: "rgba(204, 204, 204,0.1)"
-    
                     }
-    
+                  }],
+                  xAxes: [{
+                    gridLines: {
+                      color: "rgba(204, 204, 204,0.1)"
+                    }
                   }]
-    
                 }
-    
               };
     
-                var monthlyChartCanvas = $("#monthlyChart").get(0).getContext("2d");
-    
-                var monthlyChart = new Chart(monthlyChartCanvas, {
-    
-                  type: 'line',
-                  data: monthlyData,
-                  options: monthlyOptions
-    
-                });
+              var monthlyChartCanvas = $("#monthlyChart").get(0).getContext("2d");
+              var monthlyChart = new Chart(monthlyChartCanvas, {
+                type: 'line',
+                data: monthlyData,
+                options: monthlyOptions
+              });
             }
     
-          console.log(salesData);
-    
-        })
-    
-      .catch(error => console.error('Error fetching monthly sales data:', error));
-      
-    })
-    
+            console.log(salesData);
+          })
+          .catch(error => console.error('Error fetching monthly sales data:', error));
+        });
     </script>
+    
 
 
 

@@ -50,14 +50,11 @@
 
 
 <script>
-    // Function to handle OTP resend using Axios
+  
     function resendOTP() {
-        // Make a POST request to your server to resend OTP
         axios.post('/resend-otp', { email: '<%= locals.email %>' })
             .then(function (response) {
-                // Handle successful response, if needed
                 console.log('OTP resent successfully');
-                // Hide the resend OTP button
                 hideResendButton();
                 // Show the verify OTP button
                 showVerifyButton();

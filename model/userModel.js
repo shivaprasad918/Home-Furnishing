@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 // User Schema
@@ -28,10 +29,9 @@ const userSchema = new mongoose.Schema({
     },
     is_block: {
         type: String,
-        default:'active'
+        default: 'active'
     },
-
-    given_name:{
+    given_name: {
         type: String
     },
     family_name: {
@@ -48,7 +48,15 @@ const userSchema = new mongoose.Schema({
         district: { type: String, required: true },
         state: { type: String, required: true },
         postcode: { type: String, required: true }
-    }]
+    }],
+    resetPasswordToken: {
+        type: String,
+        required: false
+    },
+    resetPasswordExpires: {
+        type: Date,
+        required: false
+    }
 });
 
 // Export User schema

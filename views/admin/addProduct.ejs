@@ -19,6 +19,7 @@
   <!-- End layout styles -->
   <link rel="shortcut icon" href="assets/images/favicon.png" />
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script defer src="https://cdn.crop.guide/loader/l.js?c=PVBLBH"></script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
     integrity="sha512-FXIWtxx7V2G9M5E0yNME6GzPMDQbS6VZupE4mIsVpSGPHlDJxuvzOh6IOAX13BrInFvI6X26/ZVci3uQ/WMp9g=="
@@ -26,6 +27,23 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"
     integrity="sha512-tOAx9sHd6E6AS8jPV3eH+8G5vlnVpBOz8oXxZAZdTxUg2aZ1GNGUsA88B+H+wVDHdF3DfbxZHPzhyKFSN4PTw=="
     crossorigin="anonymous"></script>
+    <style>
+      .img-thumbnail {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        width: 150px;
+        height: 150px;
+      }
+  
+      .mr-2 {
+        margin-right: 0.5rem;
+      }
+  
+      .mt-2 {
+        margin-top: 0.5rem;
+      }
+    </style>
 
 
 
@@ -187,6 +205,12 @@
           <div class="invalid-feedback">Please provide a product name.</div>
         </div>
 
+        <div class="form-group">
+          <label for="brand">Brand:</label>
+          <input type="text" class="form-control form-control-sm" id="brand" name="brand" required>
+          <div class="invalid-feedback">Please provide a brand name.</div>
+        </div>
+
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="productPrice">Price:</label>
@@ -206,14 +230,12 @@
         <div class="form-group">
           <label for="mainCategory">Category:</label>
           <select class="form-control" id="mainCategory" name="mainCategory" required>
-            <option value=""></option>
-            <option value="Table">Table</option>
-            <option value="Seating Furniture">Seating Furniture</option>
-            <option value="Bedroom Furniture">Bedroom Furniture</option>
-            <option value="Storage Furniture">Storage Furniture</option>
+              <option value="">Select a category</option>
+              <% categories.forEach(category => { %>
+                  <option value="<%= category.categoryName %>"><%= category.categoryName %></option>
+              <% }); %>
           </select>
-          <div class="invalid-feedback">Please select a category.</div>
-        </div>
+      </div>
 
         <div class="form-group">
           <label for="subCategory">Subcategory:</label>
@@ -241,23 +263,7 @@
       </form>
     </div>
 
-    <style>
-      .img-thumbnail {
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 5px;
-        width: 150px;
-        height: 150px;
-      }
 
-      .mr-2 {
-        margin-right: 0.5rem;
-      }
-
-      .mt-2 {
-        margin-top: 0.5rem;
-      }
-    </style>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -309,62 +315,60 @@
 
       // Form validation and submission
       document.getElementById('addProductForm').addEventListener('submit', function (event) {
-        // Check for whitespace only inputs
-        const inputs = this.querySelectorAll('input, select, textarea');
-        let hasWhitespace = false;
-        inputs.forEach(function (input) {
-          if (input.value.trim() === '') {
+    // Check for whitespace only inputs
+    const inputs = this.querySelectorAll('input, select, textarea');
+    let hasWhitespace = false;
+    inputs.forEach(function (input) {
+        if (input.value.trim() === '') {
             input.classList.add('is-invalid');
             hasWhitespace = true;
-          } else {
+        } else {
             input.classList.remove('is-invalid');
-          }
-        });
-
-        if (hasWhitespace) {
-          event.preventDefault();
-          return;
         }
+    });
 
-        // Check for negative price or quantity
-        const price = parseFloat(document.getElementById('productPrice').value);
-        const quantity = parseInt(document.getElementById('quantity').value);
-        if (price < 0 || quantity < 0) {
-          document.getElementById('productPrice').classList.add('is-invalid');
-          document.getElementById('quantity').classList.add('is-invalid');
-          event.preventDefault();
-
-          return;
-        }
-
-        // Handle form submission
+    if (hasWhitespace) {
         event.preventDefault();
-        const formData = new FormData(this);
+        return;
+    }
 
-        axios.post('/admin/AddProductPost', formData)
-          .then(response => {
+    // Check for negative price or quantity
+    const price = parseFloat(document.getElementById('productPrice').value);
+    const quantity = parseInt(document.getElementById('quantity').value);
+    if (price < 0 || quantity < 0) {
+        document.getElementById('productPrice').classList.add('is-invalid');
+        document.getElementById('quantity').classList.add('is-invalid');
+        event.preventDefault();
+        return;
+    }
+
+    // Handle form submission
+    event.preventDefault();
+    const formData = new FormData(this);
+
+    axios.post('/admin/AddProductPost', formData)
+        .then(response => {
             Swal.fire({
-              icon: 'success',
-              title: 'Success',
-              text: 'Product added successfully!',
-              showConfirmButton: true,
+                icon: 'success',
+                title: 'Success',
+                text: 'Product added successfully!',
+                showConfirmButton: true,
             }).then(() => {
-              // Redirect to the "all products" page after successful submission
-              window.location.href = '/admin/allProduct';
+             
+                window.location.href = '/admin/allProduct';
             });
 
             this.reset();
             document.getElementById('imagePreview').innerHTML = '';
-          })
-          .catch(error => {
+        })
+        .catch(error => {
             Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'There was an error adding the product.',
+                icon: 'error',
+                title: 'Error',
+                text: 'There was an error adding the product.',
             });
-          });
-
-      });
+        });
+});
     </script>
 
     <!-- -------------------add product form validation end------------------- -->

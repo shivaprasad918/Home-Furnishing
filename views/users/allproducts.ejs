@@ -53,10 +53,7 @@
                         </div>
                         
                         
-                        
-
-
-
+                    
                         <div class="dropdown cart-dropdown">
 
                             <a href="/cart" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false"
@@ -106,11 +103,13 @@
         
                         <select name="category" id="filter" class="form-control" onchange="updateCategory(this)">
                             <option value="all" <%= selectedCategory === 'all' ? 'selected' : '' %>>All Categories</option>
-                            <option value="Table" <%= selectedCategory === 'Table' ? 'selected' : '' %>>Table</option>
-                            <option value="Seating Furniture" <%= selectedCategory === 'Seating Furniture' ? 'selected' : '' %>>Seating Furniture</option>
-                            <option value="Bedroom Furniture" <%= selectedCategory === 'Bedroom Furniture' ? 'selected' : '' %>>Bedroom Furniture</option>
-                            <option value="Storage Furniture" <%= selectedCategory === 'Storage Furniture' ? 'selected' : '' %>>Storage Furniture</option>
+                            <% categories.forEach(category => { %>
+                                <option value="<%= category %>" <%= selectedCategory === category ? 'selected' : '' %>>
+                                    <%= category %>
+                                </option>
+                            <% }); %>
                         </select>
+                                                
                     </nav>
                 </div>
             </nav>
@@ -173,6 +172,7 @@
                                                     <a href="#"><%= product.category.name %></a>
                                                 </div>
                                                 <h3 class="product-title"><a href="product.html"><%= product.productName %></a></h3>
+                                                <h3 class="product-title"><%= product.brand %></a></h3>
                                                 <div class="product-price">
                                                     <% if (product.offer) { %>
                                                         ₹<%= Math.floor(product.price - (product.price * product.offer.percentage / 100)) %>
@@ -181,16 +181,15 @@
                                                         ₹<%= Math.floor(product.price - (product.price * product.category.offer.percentage / 100)) %>
                                                         <s class="text-light" style="font-size: 12px;">₹<%= product.price %></s>
                                                     <% } else { %>
-                                                        ₹<%= product.price %>
-                                                    <% } %>
+                                                        ₹<%= product.price %>                             
+                                                    <% } %>                                                  
                                                 </div>
+                                                <div><%= product.quantity %></div>
                                                 <div class="ratings-container">
                                                     <div class="ratings">
                                                         <div class="ratings-val" style="width: 80%;"></div>
                                                     </div>
                                                 </div>
-                                                <p class="product-description"><%= product.description %></p>
-                                                <p class="product-quantity">Quantity: <%= product.quantity %></p>
                                             </div>
                                         </div>
                                     </div>

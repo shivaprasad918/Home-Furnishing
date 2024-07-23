@@ -1,3 +1,4 @@
+
 const express = require("express");
 const config = require("../config/config");
 const adminController = require('../controllers/adminController');
@@ -8,7 +9,6 @@ const offerController = require('../controllers/offerController');
 const orderController = require('../controllers/orderController');
 const upload = require('../config/multerConfig');
 const auth = require("../middleware/adminAuth");
-
 
 const adminRoute = express();
 
@@ -24,7 +24,6 @@ adminRoute.get('/dashboard', auth.isLogin, adminController.loadDashboard);
 adminRoute.get('/', adminController.loadLogin);
 adminRoute.post('/', adminController.verifyLogin);
 adminRoute.get('/logout', adminController.adminLogout)
-
 
 adminRoute.get('/user', auth.isLogin, adminController.loadUser);
 adminRoute.get('/action/:userId', auth.isLogin, adminController.updateUserStatus);
@@ -50,13 +49,11 @@ adminRoute.post('/delete-products/:id/delete',auth.isLogin, productController.so
 
 // Order routes
 adminRoute.get('/order', auth.isLogin, orderController.getOrder);
+adminRoute.get('/orders/:orderId',orderController.getOrderDetails);
 adminRoute.post('/order/update-status', auth.isLogin, orderController.updateOrderAndProductStatus);
 adminRoute.get('/get-return-reason', auth.isLogin, orderController.getReturnReason);
 adminRoute.post('/accept-return', auth.isLogin, orderController.acceptReturn);
 adminRoute.post('/reject-return', auth.isLogin, orderController.rejectReturn);
-
-
-
 
 // Coupon routes
 adminRoute.post('/createCoupon',auth.isLogin, couponController.createCoupon);
@@ -69,27 +66,16 @@ adminRoute.get('/offer', auth.isLogin, offerController.getOffers);
 adminRoute.delete('/deleteOffer/:id',auth.isLogin, offerController.deleteOffer);
 adminRoute.post('/applyOffer/:productId',auth.isLogin, productController.applyOffer);
 
-
-
-
-
-
 // sales report
 
 adminRoute.get('/salesreport', auth.isLogin, adminController.renderSalesReportPage);
 adminRoute.post('/salesreport', adminController.generateSalesReport);
 adminRoute.post('/salesreport/download', adminController.downloadSalesReport);
 
-
-
 //chart related
 
 adminRoute.put('/chartYear', adminController.chartYear);
-
 adminRoute.put('/monthChart', adminController.monthChart);
-
-
-
 adminRoute.get('*',adminController.admin404Error)
 
 module.exports = adminRoute;

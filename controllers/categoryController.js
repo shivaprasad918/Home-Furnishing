@@ -12,23 +12,31 @@ const loadCategory = async(req,res)=>{
     }
 }
 
-const addCategory = async(req,res)=>{
+const addCategory = async (req, res) => {
     try {
-        const { categoryLabel, subcategory,categoryDescription} = req.body;
-        const newCategory = new Category({
-            categoryName: categoryLabel,
-            subCategory:subcategory,
-            description:categoryDescription
-        });
+        const { categoryLabel, subcategory, categoryDescription } = req.body;
 
-        // Save the category to the database
-        await newCategory.save();
-        res.redirect('/admin/category')
-        
+        const existingCategory = await Category.findOne({ subCategory: subcategory });
+
+        if (existingCategory) {
+            res.status(400).json({ error: 'Subcategory already exists' });
+        } else {
+            const newCategory = new Category({
+                categoryName: categoryLabel,
+                subCategory: subcategory,
+                description: categoryDescription
+            });
+
+            await newCategory.save();
+            res.status(200).json({ success: 'Category added successfully' });
+        }
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while adding the category' });
     }
-}
+};
+
+
 
 
 const loadEditCategory = async (req, res) => {
