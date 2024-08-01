@@ -282,26 +282,12 @@ const downloadInvoice = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const order = await Order.findById(orderId).populate('User').exec();
-
-
-        // if (!order) {
-        //     return res.status(404).send('Order not found');
-        // }
-
-        // const templatePath = path.join(__dirname, '../views/invoice.ejs');
-        // const html = await ejs.renderFile(templatePath, { order });
-
-        // const options = { format: 'A4' };
-        // pdf.create(html, options).toStream((err, stream) => {
-        //     if (err) return res.status(500).send(err);
-        //     res.setHeader('Content-Type', 'application/pdf');
-        //     res.setHeader('Content-Disposition', `attachment; filename=invoice-${order._id}.pdf`);
-        //     stream.pipe(res);
-        // });
+        console.log("downloadInvoice : ");
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
         const invoiceUrl = `https://homefurnishing.fun/getInvoice/${orderId}`;
-
+        console.log("invoiceUrl : ",invoiceUrl);
+        
         await page.goto(invoiceUrl, { waitUntil: 'networkidle2' });
         const pdf = await page.pdf({ format: 'A4' });
 
@@ -311,7 +297,7 @@ const downloadInvoice = async (req, res) => {
             'Content-Type': 'application/pdf',
             'Content-Disposition': 'attachment; filename="hn.pdf"',
         });
-
+        console.log("res.send : ");
         res.send(pdf);
 
     } catch (error) {
