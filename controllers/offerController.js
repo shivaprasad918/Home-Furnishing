@@ -28,6 +28,7 @@ const createOffer = async (req, res) => {
 const getOffers = async (req, res) => {
     try {
         const offers = await Offer.find();
+        console.log(offers);
         res.render('offer', { offers })
         // res.status(200).json({ offers });
     } catch (error) {
