@@ -45,7 +45,7 @@ user_route.get('/profile', auth.isLogin, auth.isBlocked, userController.loadProf
 user_route.post('/update', auth.isLogin, auth.isBlocked, userController.updateProfile);
 
 
-user_route.get('/allproducts', auth.isLogin, auth.isBlocked, productController.getProducts);
+user_route.get('/allProducts', auth.isLogin, auth.isBlocked, productController.getProducts);
 
 user_route.get('/singleProduct', auth.isLogin, auth.isBlocked, productController.getSingleProduct);
 user_route.get('/product/:productId', auth.isLogin, auth.isBlocked, productController.getProductAndRelated);
