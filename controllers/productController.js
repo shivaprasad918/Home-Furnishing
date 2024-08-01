@@ -125,7 +125,7 @@ const loadAllProduct = async (req, res) => {
 
         const offers = await Offer.find({ status: true });
 
-        res.render('allProducts', {
+        res.render('allProduct', {
             products,
             offers,
             currentPage: page,

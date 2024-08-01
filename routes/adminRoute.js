@@ -40,7 +40,7 @@ adminRoute.post('/updateCategory', auth.isLogin, categoryController.updateCatego
 adminRoute.post('/delete-category/:id', auth.isLogin, categoryController.softDeleteCategory);
 
 // Product routes
-adminRoute.get('/allProducts', auth.isLogin, productController.loadAllProduct);
+adminRoute.get('/allProduct', auth.isLogin, productController.loadAllProduct);
 adminRoute.get('/addProduct', auth.isLogin, productController.loadAddProduct);
 adminRoute.post('/AddProductPost', auth.isLogin, upload.array('product_image', 3), productController.addProduct);
 adminRoute.post('/fetch-subcategory', auth.isLogin, productController.getSubcategories);
