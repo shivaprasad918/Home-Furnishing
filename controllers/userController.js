@@ -71,19 +71,33 @@ const insertUser = async (req, res) => {
         await user.save(); // Save the user to get the _id
 
         // Referral logic
-        const referrer = await User.findOne({ referralCode: req.body.referralCode });
-        if (referrer) {
-            const referrerWallet = await Wallet.findOne({ userId: referrer._id });
-            const newUserWallet = await Wallet.findOne({ userId: user._id }) || new Wallet({ userId: user._id, balance: 0 });
+        const referral = req.body.referredBy; 
+        console.log(referral);
 
-            if (referrerWallet) {
-                referrerWallet.balance += 100; 
+        if (referral) {
+            const referrer = await User.findOne({ referralCode: referral });
+            if (referrer) {
+                console.log("refferererre",referrer);
+                console.log("userrrrr",user);
+                // Update referrer's wallet
+                const referrerWallet = await Wallet.findOne({ userId: referrer._id }) || new Wallet({ userId: referrer._id, balance: 0 });
+                referrerWallet.balance += 100;
                 await referrerWallet.save();
+        
+                // Update new user's wallet
+                const newUserWallet = await Wallet.findOne({ userId: user._id }) || new Wallet({ userId: user._id, balance: 0 });
+                newUserWallet.balance += 100;
+                await newUserWallet.save();
+        
+                console.log(`Referral successful. Referrer and new user both received 100 Rs.`);
+            } else {
+                console.log('Invalid referral code provided.');
             }
-
-            newUserWallet.balance += 100; 
-            await newUserWallet.save();
+        } else {
+            console.log('No referral code provided.');
         }
+        
+        
 
         const otp = generateOTP();
         sendVerifyEmail(req.body.name, req.body.email, user._id, otp);
