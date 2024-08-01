@@ -283,7 +283,10 @@ const downloadInvoice = async (req, res) => {
         const orderId = req.params.orderId;
         const order = await Order.findById(orderId).populate('User').exec();
         console.log("downloadInvoice : ");
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            headless: true,
+          });
         const page = await browser.newPage();
         const invoiceUrl = `https://homefurnishing.fun/getInvoice/${orderId}`;
         console.log("invoiceUrl : ",invoiceUrl);
@@ -301,7 +304,8 @@ const downloadInvoice = async (req, res) => {
         res.send(pdf);
 
     } catch (error) {
-        res.status(500).send(error);
+        console.error("Error in downloadInvoice:", error);
+        res.status(500).send(error.toString());
     }
 }
 
