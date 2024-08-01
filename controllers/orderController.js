@@ -337,13 +337,17 @@ const getInvoice = async (req, res) => {
 
 const getOrder = async (req, res) => {
     try {
-        const orders = await Order.find({ paymentStatus: { $ne: 'failed' } }).populate('User').populate('products');
+        const orders = await Order.find()
+            .populate('User') 
+            .populate('products.product') 
+            .populate('products.category'); 
         res.render('order', { orders });
     } catch (error) {
         console.error('Error fetching orders:', error);
-        res.status(500).send('Error fetching orders');
+        res.status(500).send('Internal Server Error');
     }
 };
+
 
 const getOrderDetails = async (req, res) => {
     try {

@@ -211,7 +211,7 @@ const editProduct = async (req, res) => {
             brand
         };
 
-        if (req.files && req.files.length > 0) {
+        if (req.files && req.files.length) {
             const processedImages = await Promise.all(req.files.map(async (file) => {
                 try {
                     console.log("process image:", file.filename);
@@ -457,6 +457,27 @@ const applyOffer = async (req, res) => {
 
 
 
+const removeOffer = async (req, res) => {
+    try {
+      const { productId } = req.params;
+  
+      const product = await Product.findById(productId);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+  
+      product.offer = null;
+  
+      await product.save();
+  
+      res.status(200).json({ message: 'Offer removed successfully' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+
+
 
 module.exports = {
     loadAllProduct,
@@ -470,5 +491,6 @@ module.exports = {
     deleteProductImage,
     getSingleProduct,
     getProductAndRelated,
-    applyOffer
+    applyOffer,
+    removeOffer
 }

@@ -56,7 +56,12 @@ const userSchema = new mongoose.Schema({
     resetPasswordExpires: {
         type: Date,
         required: false
-    }
+    },
+    //referal code 
+    referralCode: {
+        type: String,
+        unique: true
+    },  
 });
 
 // Export User schema

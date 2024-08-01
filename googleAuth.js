@@ -47,6 +47,7 @@ router.get('/auth/google/callback', async (req, res) => {
         name: profile.name,
         email: profile.email,
         password: profile.id,
+        is_verified:true
       });
 
       await user.save();

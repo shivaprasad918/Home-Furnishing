@@ -215,7 +215,7 @@
                                         <tbody>
                                             <% orders.forEach(order => { %>
                                                 <tr>
-                                                    <td><%= order.User.name %></td>
+                                                    <td><%= order.User ? order.User.name : 'Unknown User' %></td>
                                                     <td><%= order.createdAt.toDateString() %></td>
                                                     <td><%= order.products.reduce((total, product) => total + product.quantity, 0) %></td>
                                                     <td><%= order.totalPrice.toFixed(2) %></td>
@@ -225,6 +225,7 @@
                                                 </tr>
                                             <% }); %>
                                         </tbody>
+                                        
                                     </table>
                                 </div>
                             </div>

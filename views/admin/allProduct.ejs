@@ -210,9 +210,14 @@
                       <%= product.category ? product.category.subCategory : 'N/A' %>
                     </td>
                     <td>
-                      <button class="btn btn-success apply-offer" data-product-id="<%= product._id %>"
-                        <%=product.offerApplied ? 'disabled' : '' %>>Apply Offer</button>
+                      <% if (product.offer) { %>
+                        <button class="btn btn-warning remove-offer" data-product-id="<%= product._id %>">Remove Offer</button>
+                      <% } else { %>
+                        <button class="btn btn-success apply-offer" data-product-id="<%= product._id %>">Apply Offer</button>
+                      <% } %>
                     </td>
+                    
+                    
                     <td><a href="/admin/editProduct/<%= product._id %>" class="btn btn-primary">Edit</a></td>
                     <td>
                       <form id="deleteForm" action="/admin/delete-products/<%= product._id %>/delete" method="POST">
@@ -314,65 +319,108 @@
             }
           </style>
 
-          <script>
-            document.addEventListener('DOMContentLoaded', function () {
-              const applyOfferButtons = document.querySelectorAll('.apply-offer');
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  const applyOfferButtons = document.querySelectorAll('.apply-offer');
+  const removeOfferButtons = document.querySelectorAll('.remove-offer');
 
-              applyOfferButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                  const productId = this.getAttribute('data-product-id');
-                  $('#offerModal').modal('show');
+  // Apply Offer Functionality
+  applyOfferButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const productId = this.getAttribute('data-product-id');
+      $('#offerModal').modal('show');
 
-                  const selectOfferButtons = document.querySelectorAll('.select-offer');
+      const selectOfferButtons = document.querySelectorAll('.select-offer');
 
-                  selectOfferButtons.forEach(selectButton => {
-                    selectButton.addEventListener('click', function () {
-                      const offerId = this.getAttribute('data-offer-id');
-                      const offerName = this.parentElement.querySelector('.card-title').innerText;
+      selectOfferButtons.forEach(selectButton => {
+        selectButton.addEventListener('click', function () {
+          const offerId = this.getAttribute('data-offer-id');
+          const offerName = this.parentElement.querySelector('.card-title').innerText;
 
-                      Swal.fire({
-                        title: 'Apply Offer',
-                        text: `Are you sure you want to apply "${offerName}" to this product?`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Apply',
-                        cancelButtonText: 'Cancel'
-                      }).then((result) => {
-                        if (result.isConfirmed) {
-                          applyOffer(productId, offerId, button);
-                        }
-                      });
-                    });
-                  });
-                });
-              });
+          Swal.fire({
+            title: 'Apply Offer',
+            text: `Are you sure you want to apply "${offerName}" to this product?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Apply',
+            cancelButtonText: 'Cancel'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              applyOffer(productId, offerId);
+            }
+          });
+        });
+      });
+    });
+  });
 
-              function applyOffer(productId, offerId, button) {
-                axios.post(`/admin/applyOffer/${productId}`, {
-                  offerId
-                })
-                  .then(response => {
-                    Swal.fire({
-                      title: 'Success!',
-                      text: response.data.message,
-                      icon: 'success',
-                      confirmButtonText: 'OK'
-                    }).then(() => {
-                      button.disabled = true; // Disable the button
-                      window.location.href = '/admin/allProduct'; // Redirect to the all products page
-                    });
-                  })
-                  .catch(error => {
-                    Swal.fire({
-                      title: 'Error!',
-                      text: error.response.data.error || 'Failed to apply offer.',
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                    });
-                  });
-              }
-            });
-          </script>
+  // Remove Offer Functionality
+  removeOfferButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const productId = this.getAttribute('data-product-id');
+
+      Swal.fire({
+        title: 'Remove Offer',
+        text: 'Are you sure you want to remove the offer from this product?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Remove',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          removeOffer(productId);
+        }
+      });
+    });
+  });
+
+  function applyOffer(productId, offerId) {
+    axios.post(`/admin/applyOffer/${productId}`, { offerId })
+      .then(response => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.data.message,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          window.location.reload(); // Reload the page to reflect changes
+        });
+      })
+      .catch(error => {
+        Swal.fire({
+          title: 'Error!',
+          text: error.response.data.error || 'Failed to apply offer.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      });
+  }
+
+  function removeOffer(productId) {
+    axios.post(`/admin/removeOffer/${productId}`)
+      .then(response => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.data.message,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          window.location.reload(); // Reload the page to reflect changes
+        });
+      })
+      .catch(error => {
+        Swal.fire({
+          title: 'Error!',
+          text: error.response.data.error || 'Failed to remove offer.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      });
+  }
+});
+
+</script>
+
         </div>
       </div>
     </div>

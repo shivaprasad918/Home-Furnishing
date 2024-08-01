@@ -213,9 +213,13 @@
                         </form>
                       </td>
                       <td>
-                        <button class="btn btn-success apply-offer" data-category-id="<%= cat._id %>" <%=cat.offers
-                          ? 'disabled' : '' %>>Apply Offer</button>
+                        <% if (cat.offers) { %>
+                          <button class="btn btn-warning remove-offer" data-category-id="<%= cat._id %>">Remove Offer</button>
+                        <% } else { %>
+                          <button class="btn btn-success apply-offer" data-category-id="<%= cat._id %>">Apply Offer</button>
+                        <% } %>
                       </td>
+                      
                       <td>
                         <a href="/admin/updateCategory?id=<%= cat._id %>" class="btn btn-primary">Edit</a>
                       </td>
@@ -286,13 +290,13 @@
           button.addEventListener('click', function () {
             const categoryId = this.getAttribute('data-category-id');
             $('#offerModal').modal('show');
-
+    
             // Attach event listeners for select offer buttons only once
             document.querySelectorAll('.select-offer').forEach(selectButton => {
               selectButton.addEventListener('click', function () {
                 const offerId = this.getAttribute('data-offer-id');
                 const offerName = this.parentElement.querySelector('.card-title').innerText;
-
+    
                 Swal.fire({
                   title: 'Apply Offer',
                   text: `Are you sure you want to apply "${offerName}" to this category?`,
@@ -309,7 +313,7 @@
             });
           });
         });
-
+    
         function applyOffer(categoryId, offerId, button) {
           axios.post(`/admin/applyOfferToCategory/${categoryId}`, { offerId })
             .then(response => {
@@ -319,7 +323,7 @@
                 icon: 'success',
                 confirmButtonText: 'OK'
               }).then(() => {
-                button.disabled = true; // Disable the button after applying the offer
+                // button.disabled = true; // Disable the button after applying the offer (removed)
                 $('#offerModal').modal('hide'); // Hide the modal
               });
             })
@@ -333,8 +337,59 @@
             });
         }
       });
+    </script>
+
+    <script>
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Event listener for apply offer button (existing code)
+  
+  // Event listener for remove offer button
+  document.querySelectorAll('.remove-offer').forEach(button => {
+    button.addEventListener('click', function () {
+      const categoryId = this.getAttribute('data-category-id');
+
+      Swal.fire({
+        title: 'Remove Offer',
+        text: 'Are you sure you want to remove the offer from this category?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Remove',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          removeOffer(categoryId, button);
+        }
+      });
+    });
+  });
+
+  function removeOffer(categoryId, button) {
+    axios.post(`/admin/removeOfferFromCategory/${categoryId}`)
+      .then(response => {
+        Swal.fire({
+          title: 'Success!',
+          text: response.data.message,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          // Reload the page or update the UI to reflect the changes
+          location.reload();
+        });
+      })
+      .catch(error => {
+        Swal.fire({
+          title: 'Error!',
+          text: error.response.data.error || 'Failed to remove offer.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      });
+  }
+});
 
     </script>
+    
 
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

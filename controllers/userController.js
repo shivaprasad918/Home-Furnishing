@@ -47,37 +47,80 @@ const loadRegister = async (req, res) => {
     }
 };
 
+
+
 const insertUser = async (req, res) => {
     try {
         const presentUser = await User.findOne({ email: req.body.email });
         if (presentUser) {
-            req.session.registrationMessage = 'User Already Exist';
+            req.session.registrationMessage = 'User Already Exists';
             return res.redirect('/register');
-        } else {
-            const hashedPassword = await securePassword(req.body.password);
-            const user = new User({
-                name: req.body.name,
-                email: req.body.email,
-                mobile: req.body.mobile,
-                password: hashedPassword,
-                is_admin: 0
-            });
-
-            const otp = generateOTP();
-            sendVerifyEmail(req.body.name, req.body.email, user._id, otp);
-
-            await user.save();
-
-            req.session.registrationMessage = 'Your registration has been successful.';
-            req.session.user_id = user._id;
-            return res.redirect(`/otp?email=${req.body.email}`);
         }
+
+        const hashedPassword = await securePassword(req.body.password);
+        const referralCode = await generateUniqueReferralCode(); // Await the function
+        const user = new User({
+            name: req.body.name,
+            email: req.body.email,
+            mobile: req.body.mobile,
+            password: hashedPassword,
+            is_admin: 0,
+            referralCode: referralCode,
+        });
+
+        // Referral logic
+        if (referralCode) {
+            const referrer = await User.findOne({ referralCode: referralCode });
+            if (referrer) {
+                referrer.Wallet.balance += 100; // Credit to referrer's wallet
+                user.Wallet.balance += 100; // Credit to new user's wallet
+                await referrer.save();
+            }
+        }
+
+        const otp = generateOTP();
+        sendVerifyEmail(req.body.name, req.body.email, user._id, otp);
+
+        await user.save();
+
+        req.session.registrationMessage = 'Your registration has been successful.';
+        req.session.user_id = user._id;
+        return res.redirect(`/otp?email=${req.body.email}`);
     } catch (error) {
         console.error('Error in insertUser:', error);
         req.session.registrationMessage = 'Your registration has failed.';
         return res.redirect('/register');
     }
 };
+
+
+
+
+const generateUniqueReferralCode = async () => {
+    // Function to generate a random alphanumeric string of specified length
+    const generateCode = (length) => {
+        return crypto.randomBytes(Math.ceil(length / 2))
+            .toString('hex')
+            .slice(0, length)
+            .toUpperCase(); // To ensure the code is alphanumeric and upper case
+    };
+
+    let referralCode;
+    let isUnique = false;
+
+    while (!isUnique) {
+        // Generate a new referral code
+        referralCode = generateCode(6); // Adjust the length as needed
+        // Check if this code already exists in the database
+        const existingUser = await User.findOne({ referralCode });
+        if (!existingUser) {
+            isUnique = true; // Code is unique
+        }
+    }
+
+    return referralCode;
+};
+
 
 
 const loadLogin = async (req, res) => {
@@ -272,7 +315,7 @@ const resetPassword = async (req, res) => {
 
         const token = crypto.randomBytes(20).toString('hex');
         user.resetPasswordToken = token;
-        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+        user.resetPasswordExpires = Date.now() + 3600000; 
 
         await user.save();
         console.log('Token generated:', token);
@@ -416,21 +459,20 @@ const loadProfile = async (req, res) => {
                         date: new Date()  // Add date to transaction
                     });
 
-                    // Mark the product as refund processed to avoid duplicate refunds
+               
                     product.refundProcessed = true;
                 }
             }
-            await order.save(); // Save the order with updated product statuses
+            await order.save(); 
         }
 
-        // Update the wallet balance if there were any refunds
+
         if (totalRefund > 0) {
             await userWallet.updateBalance(totalRefund);
             userWallet.transactions.push(...refundTransactions);
             await userWallet.save();
         }
 
-        // Calculate total quantity of products for each order
         const orderDetails = orders.map(order => {
             const totalQuantity = order.products.reduce((sum, item) => sum + item.quantity, 0);
             return {
@@ -665,5 +707,5 @@ module.exports = {
     editAddress,
     updateAddress,
     deleteAddress,
-    load404Page
+    load404Page,
 }

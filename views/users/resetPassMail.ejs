@@ -12,19 +12,33 @@
         /* Custom styles */
         .container {
             margin-top: 50px;
+            max-width: 500px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        body {
+            background-color: #f8f9fa;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Reset Password</h2>
-        <form id="resetPasswordForm">
-            <div class="form-group">
-                <label for="email">Enter your email address:</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Reset Password</button>
-        </form>
+        <div class="card">
+            <h2 class="text-center">Reset Password</h2>
+            <form id="resetPasswordForm">
+                <div class="form-group">
+                    <label for="email">Enter your email address:</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
+            </form>
+        </div>
     </div>
 
     <!-- SweetAlert2 JS -->

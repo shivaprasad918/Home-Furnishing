@@ -33,6 +33,7 @@ adminRoute.get('/category', auth.isLogin, categoryController.loadCategory);
 adminRoute.post('/category', auth.isLogin, categoryController.addCategory);
 adminRoute.get('/allCategory', auth.isLogin, categoryController.loadEditCategory);
 adminRoute.post('/applyOfferToCategory/:categoryId', categoryController.applyOfferToCategory);
+adminRoute.post('/removeOfferFromCategory/:categoryId', categoryController.removeOfferFromCategory);
 adminRoute.post('/allCategory', auth.isLogin, categoryController.updateCategorStatus);
 adminRoute.get('/updateCategory', auth.isLogin, categoryController.loadUpdateCategory);
 adminRoute.post('/updateCategory', auth.isLogin, categoryController.updateCategory);
@@ -66,6 +67,8 @@ adminRoute.post('/createOffer', auth.isLogin, offerController.createOffer);
 adminRoute.get('/offer', auth.isLogin, offerController.getOffers);
 adminRoute.delete('/deleteOffer/:id', auth.isLogin, offerController.deleteOffer);
 adminRoute.post('/applyOffer/:productId', auth.isLogin, productController.applyOffer);
+adminRoute.post('/removeOffer/:productId', auth.isLogin, productController.removeOffer);
+
 
 // sales report
 

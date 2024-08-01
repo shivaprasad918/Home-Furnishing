@@ -105,7 +105,7 @@
 								        <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-wallet" role="tab" aria-controls="tab-wallet" aria-selected="false">Wallet</a>
 								    </li>
 								    <li class="nav-item">
-								        <a class="nav-link" href="#">Sign Out</a>
+								        <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-referal" role="tab" aria-controls="tab-referal" aria-selected="false">Referral code</a>
 								    </li>
 								</ul>
 	                		</aside><!-- End .col-lg-3 -->
@@ -267,6 +267,26 @@
                                             </div>
                                         </div>
                                     </div><!-- .End .tab-pane -->
+
+
+
+
+                                    <div class="tab-pane fade" id="tab-referal" role="tabpanel" aria-labelledby="tab-wallet-link">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card card-dashboard">
+                                                    <div class="card-body">
+                                                        <h4>Referral Code</h4>
+                                                        <div>
+                                                            <p><%= user.referralCode %></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- .End .tab-pane -->
+
+
                                     
                                     
 								</div>
