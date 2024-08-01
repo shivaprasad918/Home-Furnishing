@@ -357,7 +357,7 @@ const getProducts = async (req, res) => {
         const totalPages = Math.ceil(totalProducts / perPage);
         const paginatedProducts = products.slice(skip, skip + perPage);
 
-        res.render('users/allProducts', {
+        res.render('allProducts', {
             currentPage,
             totalPages,
             products: paginatedProducts,
