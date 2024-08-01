@@ -366,7 +366,7 @@ const getProducts = async (req, res) => {
             searchTerm: q || '',
             queryParams: `&q=${q || ''}&sort=${sort || 'default'}&category=${category || 'all'}`,
             noProducts: paginatedProducts.length === 0,
-            categories: uniqueCategories // Pass unique categories to the view
+            categories: uniqueCategories 
         });
 
     } catch (error) {
@@ -430,7 +430,6 @@ const getProductAndRelated = async (req, res) => {
 
 const applyOffer = async (req, res) => {
     try {
-        console.log("jf;woejfjwefienfihfi");
         const { productId } = req.params;
         const { offerId } = req.body;
 
