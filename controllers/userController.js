@@ -68,23 +68,31 @@ const insertUser = async (req, res) => {
             referralCode: referralCode,
         });
 
+        await user.save(); // Save the user to get the _id
+
         // Referral logic
-        if (referralCode) {
-            const referrer = await User.findOne({ referralCode: referralCode });
-            if (referrer) {
-                referrer.Wallet.balance += 100; // Credit to referrer's wallet
-                user.Wallet.balance += 100; // Credit to new user's wallet
-                await referrer.save();
+        const referrer = await User.findOne({ referralCode: req.body.referralCode });
+        if (referrer) {
+            const referrerWallet = await Wallet.findOne({ userId: referrer._id });
+            const newUserWallet = await Wallet.findOne({ userId: user._id }) || new Wallet({ userId: user._id, balance: 0 });
+
+            if (referrerWallet) {
+                referrerWallet.balance += 100; 
+                await referrerWallet.save();
             }
+
+            newUserWallet.balance += 100; 
+            await newUserWallet.save();
         }
 
         const otp = generateOTP();
         sendVerifyEmail(req.body.name, req.body.email, user._id, otp);
 
-        await user.save();
-
-        req.session.registrationMessage = 'Your registration has been successful.';
         req.session.user_id = user._id;
+        if(user.is_verified) {
+            req.session.registrationMessage = 'Your registration has been successful.';
+        }
+
         return res.redirect(`/otp?email=${req.body.email}`);
     } catch (error) {
         console.error('Error in insertUser:', error);
@@ -92,6 +100,7 @@ const insertUser = async (req, res) => {
         return res.redirect('/register');
     }
 };
+
 
 
 
@@ -234,6 +243,8 @@ const verifyMail = async (req, res) => {
         if (otp == Otp) {
             user.is_verified = true;
             user.save()
+
+            
             res.redirect('/')
         }
         else {

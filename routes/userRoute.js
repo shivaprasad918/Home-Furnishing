@@ -18,7 +18,7 @@ user_route.set('views', './views/users');
 user_route.use(express.json());
 user_route.use(express.urlencoded({ extended: true }));
 
-user_route.get('/', auth.isLogin, auth.isBlocked, userController.loadHome);
+user_route.get('/', auth.isLogin,auth.isBlocked,auth.isVerified, userController.loadHome);
 
 user_route.get('/register', auth.isLogin, auth.isBlocked, userController.loadRegister);
 user_route.post('/register', auth.isLogin, auth.isBlocked, userController.insertUser);
@@ -46,6 +46,7 @@ user_route.post('/update', auth.isLogin, auth.isBlocked, userController.updatePr
 
 
 user_route.get('/allproducts', auth.isLogin, auth.isBlocked, productController.getProducts);
+
 user_route.get('/singleProduct', auth.isLogin, auth.isBlocked, productController.getSingleProduct);
 user_route.get('/product/:productId', auth.isLogin, auth.isBlocked, productController.getProductAndRelated);
 

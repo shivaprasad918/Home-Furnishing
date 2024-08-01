@@ -28,8 +28,6 @@ const loginPagecheck = async(req,res,next)=>{
 }
 
 
-
-
 //blocking the user
 const isBlocked = async (req, res, next) => {
     try {
@@ -54,10 +52,37 @@ const isBlocked = async (req, res, next) => {
     }
 };
 
+const isVerified = async (req, res, next) => {
+    try {
+        if (req.session.user_id) {
+            const user = await User.findById(req.session.user_id);
+
+            if (!user || !user.is_verified) {
+                req.session.destroy(err => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).send('Internal Server Error');
+                    }
+                    return res.redirect('/otp');
+                });
+            } else {
+                next();
+            }
+        } else {
+            next();
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
 
 
 module.exports = {
     isLogin,
     isBlocked,
-    loginPagecheck
+    loginPagecheck,
+    isVerified
 }

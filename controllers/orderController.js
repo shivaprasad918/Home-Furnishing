@@ -300,7 +300,7 @@ const downloadInvoice = async (req, res) => {
         // });
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-        const invoiceUrl = `http://localhost:3005/getInvoice/${orderId}`;
+        const invoiceUrl = `https://homefurnishing.fun/getInvoice/${orderId}`;
 
         await page.goto(invoiceUrl, { waitUntil: 'networkidle2' });
         const pdf = await page.pdf({ format: 'A4' });

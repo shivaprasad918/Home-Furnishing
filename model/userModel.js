@@ -57,12 +57,10 @@ const userSchema = new mongoose.Schema({
         type: Date,
         required: false
     },
-    //referal code 
     referralCode: {
         type: String,
         unique: true
     },  
 });
 
-// Export User schema
 module.exports = mongoose.model('User', userSchema);
