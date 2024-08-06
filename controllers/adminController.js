@@ -267,8 +267,7 @@ const downloadSalesReportPDF = async (req, res) => {
         res.set({
             'Content-Type': 'application/pdf',
             'Content-Disposition': 'attachment; filename="sales_report.pdf"',
-        });
-        res.send(pdf);
+        }).send(pdf);
 
         console.log('Sales report PDF downloaded successfully');
     } catch (error) {
