@@ -74,7 +74,9 @@ adminRoute.post('/removeOffer/:productId', auth.isLogin, productController.remov
 
 adminRoute.get('/salesreport', auth.isLogin, adminController.renderSalesReportPage);
 adminRoute.post('/salesreport', adminController.generateSalesReport);
-adminRoute.post('/salesreport/download', adminController.downloadSalesReport);
+adminRoute.post('/salesreport/download', adminController.downloadSalesReportPDF);
+adminRoute.get('/salesreport/template', adminController.getSalesReportTemplate);
+
 
 //chart related
 

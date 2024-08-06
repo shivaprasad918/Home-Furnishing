@@ -20,12 +20,10 @@ const createCoupon = async (req, res) => {
     try {
         const { couponName, discount, validFrom, validUntil, minPurchaseAmount } = req.body;
 
-        if (!couponName || !discount || !validFrom || !validUntil || !minPurchaseAmount) {
-            return res.status(400).json({ message: 'Please provide all required fields' });
-        }
-
+    
         const couponCode = generateCouponCode();
 
+        // Create new coupon
         const newCoupon = new Coupon({
             couponName,
             couponCode,
@@ -40,9 +38,13 @@ const createCoupon = async (req, res) => {
 
         res.status(201).json({ message: 'Coupon created successfully', coupon: newCoupon });
     } catch (error) {
+        console.error('Error creating coupon:', error); // Debugging
         res.status(500).json({ error: error.message });
     }
 };
+
+
+
 
 
 

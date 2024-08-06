@@ -281,9 +281,7 @@ const returnOrder = async (req, res) => {
 const downloadInvoice = async (req, res) => {
     try {
         const orderId = req.params.orderId;
-        console.log(orderId);
         const order = await Order.findById(orderId).populate('User').exec();
-        console.log("downloadInvoice : ");
         const browser = await puppeteer.launch({
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
             headless: true,

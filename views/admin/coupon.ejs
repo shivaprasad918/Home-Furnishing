@@ -157,13 +157,13 @@
         </li>
         <li class="nav-item menu-items">
           <a class="nav-link" href="/admin/salesReport">
-              <span class="menu-icon">
-                  <i class="mdi mdi-security"></i>
-              </span>
-              <span class="menu-title">Sales Report</span>
+            <span class="menu-icon">
+              <i class="mdi mdi-security"></i>
+            </span>
+            <span class="menu-title">Sales Report</span>
           </a>
-      </li>
-    
+        </li>
+
       </ul>
     </nav>
 
@@ -217,177 +217,182 @@
 
     <!-- Add Coupon Modal -->
     <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addCouponModalLabel">Add Coupon</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="couponForm">
-            <div class="form-group">
-              <label for="couponName">Coupon Name:</label>
-              <input type="text" id="couponName" name="couponName" class="form-control" required>
-              <div class="invalid-feedback" id="couponNameError"></div>
-            </div>
-            <div class="form-group">
-              <label for="discount">Discount:</label>
-              <input type="number" id="discount" name="discount" class="form-control" required>
-              <div class="invalid-feedback" id="discountError"></div>
-            </div>
-            <div class="form-group">
-              <label for="validFrom">Valid From:</label>
-              <input type="date" id="validFrom" name="validFrom" class="form-control" required>
-              <div class="invalid-feedback" id="validFromError"></div>
-            </div>
-            <div class="form-group">
-              <label for="validUntil">Valid Until:</label>
-              <input type="date" id="validUntil" name="validUntil" class="form-control" required>
-              <div class="invalid-feedback" id="validUntilError"></div>
-            </div>
-            <div class="form-group">
-              <label for="minPurchaseAmount">Minimum Purchase Amount:</label>
-              <input type="number" id="minPurchaseAmount" name="minPurchaseAmount" class="form-control" required>
-              <div class="invalid-feedback" id="minPurchaseAmountError"></div>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Coupon</button>
-          </form>
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCouponModalLabel">Add Coupon</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="couponForm">
+              <p class="text-danger" id="displayerror"></p>
+              <div class="form-group">
+                <label for="couponName">Coupon Name:</label>
+                <input type="text" id="couponName" name="couponName" class="form-control" required>
+                <div class="invalid-feedback  " id="couponNameError"></div>
+              </div>
+              <div class="form-group">
+                <label for="discount">Discount:</label>
+                <input type="number" id="discount" name="discount" class="form-control" required>
+              </div>
+              <p class="invalid-feedback text-success" style="color: aqua;" id="discountError"></p>
+              <div class="form-group">
+                <label for="validFrom">Valid From:</label>
+                <input type="date" id="validFrom" name="validFrom" class="form-control" required>
+                <div class="invalid-feedback" id="validFromError"></div>
+              </div>
+              <div class="form-group">
+                <label for="validUntil">Valid Until:</label>
+                <input type="date" id="validUntil" name="validUntil" class="form-control" required>
+                <div class="invalid-feedback" id="validUntilError"></div>
+              </div>
+              <div class="form-group">
+                <label for="minPurchaseAmount">Minimum Purchase Amount:</label>
+                <input type="number" id="minPurchaseAmount" name="minPurchaseAmount" class="form-control" required>
+                <div class="invalid-feedback" id="minPurchaseAmountError"></div>
+              </div>
+              <button type="submit" class="btn btn-primary">Create Coupon</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
 
 
     <script>
       document.getElementById('couponForm').addEventListener('submit', function (event) {
-          event.preventDefault(); // Prevent the form from submitting
-      
-          // Clear previous error messages
-          document.getElementById('couponNameError').innerText = '';
-          document.getElementById('discountError').innerText = '';
-          document.getElementById('validFromError').innerText = '';
-          document.getElementById('validUntilError').innerText = '';
-          document.getElementById('minPurchaseAmountError').innerText = '';
-      
-          // Get form values
-          const couponName = document.getElementById('couponName').value.trim();
-          const discount = parseInt(document.getElementById('discount').value);
-          const validFrom = new Date(document.getElementById('validFrom').value);
-          const validUntil = new Date(document.getElementById('validUntil').value);
-          const minPurchaseAmount = parseFloat(document.getElementById('minPurchaseAmount').value);
-      
-          let isValid = true;
-      
-          // Validation
-          if (!couponName) {
-              document.getElementById('couponNameError').innerText = 'Please enter the coupon name.';
-              isValid = false;
-          }
-      
-          if (isNaN(discount) || discount <= 0) {
-              document.getElementById('discountError').innerText = 'Please enter a valid discount.';
-              isValid = false;
-          }
-      
-          if (isNaN(validFrom.getTime())) {
-              document.getElementById('validFromError').innerText = 'Please enter a valid start date.';
-              isValid = false;
-          }
-      
-          if (isNaN(validUntil.getTime())) {
-              document.getElementById('validUntilError').innerText = 'Please enter a valid end date.';
-              isValid = false;
-          }
-      
-          if (validFrom >= validUntil) {
-              document.getElementById('validFromError').innerText = 'The start date must be before the end date.';
-              isValid = false;
-          }
-      
-          if (isNaN(minPurchaseAmount) || minPurchaseAmount <= 0) {
-              document.getElementById('minPurchaseAmountError').innerText = 'Please enter a valid minimum purchase amount.';
-              isValid = false;
-          }
-      
-          if (isValid) {
-              // Collect form data
-              const formData = new FormData(this);
-              const data = {};
-              formData.forEach((value, key) => {
-                  data[key] = value;
-              });
-      
-              // Submit form data via axios
-              axios.post('/admin/createCoupon', data)
-                  .then(response => {
-                      if (response.data.message) {
-                          Swal.fire({
-                              title: 'Success!',
-                              text: response.data.message,
-                              icon: 'success',
-                              confirmButtonText: 'OK'
-                          }).then(() => {
-                              // Reload the page to update the table
-                              location.reload();
-                          });
-                      }
-                  })
-                  .catch(error => {
-                      Swal.fire({
-                          title: 'Error!',
-                          text: error.response.data.error || 'Something went wrong!',
-                          icon: 'error',
-                          confirmButtonText: 'OK'
-                      });
-                  });
-          }
-      });
-      
+    event.preventDefault(); 
+
+    var couponNameError = document.getElementById('displayerror');
+    var discountError = document.getElementById('displayerror');
+    var validFromError = document.getElementById('displayerror');
+    var validUntilError = document.getElementById('displayerror');
+    var minPurchaseAmountError = document.getElementById('displayerror');
+
+    // Clear previous error messages
+    couponNameError.textContent = '';
+    discountError.textContent = '';
+    validFromError.textContent = '';
+    validUntilError.textContent = '';
+    minPurchaseAmountError.textContent = '';
+
+    const couponName = document.getElementById('couponName').value.trim();
+    const discount = parseFloat(document.getElementById('discount').value); 
+    const validFrom = new Date(document.getElementById('validFrom').value);
+    const validUntil = new Date(document.getElementById('validUntil').value);
+    const minPurchaseAmount = parseFloat(document.getElementById('minPurchaseAmount').value);
+
+    let isValid = true;
+
+    // Validation
+    if (!couponName) {
+        couponNameError.textContent = 'Please enter the coupon name.';
+        isValid = false;
+    }
+
+    if (isNaN(discount) || discount <= 0 || discount > 100) {
+        discountError.innerHTML = 'Please enter a valid discount between 1 and 100.';
+        isValid = false;
+    }
+
+    if (isNaN(validFrom.getTime())) {
+        validFromError.textContent = 'Please enter a valid start date.';
+        isValid = false;
+    }
+
+    if (isNaN(validUntil.getTime())) {
+        validUntilError.textContent = 'Please enter a valid end date.';
+        isValid = false;
+    }
+
+    if (validFrom >= validUntil) {
+        validFromError.textContent = 'The start date must be before the end date.';
+        isValid = false;
+    }
+
+    if (isNaN(minPurchaseAmount) || minPurchaseAmount <= 0) {
+        minPurchaseAmountError.textContent = 'Please enter a valid minimum purchase amount.';
+        isValid = false;
+    }
+
+    if (isValid) {
+        // Collect form data
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        // Submit form data via axios
+        axios.post('/admin/createCoupon', data)
+            .then(response => {
+                if (response.data.message) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: response.data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload the page to update the table
+                        location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.response.data.error || 'Something went wrong!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+    }
+});
       // Delete coupon event listener
       document.querySelectorAll('.delete-coupon').forEach(button => {
-          button.addEventListener('click', function () {
-              const couponRow = this.closest('tr');
-              const couponId = couponRow.getAttribute('data-id');
-      
-              Swal.fire({
-                  title: 'Are you sure?',
-                  text: "You won't be able to revert this!",
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'Yes, delete it!'
-              }).then((result) => {
-                  if (result.isConfirmed) {
-                      axios.delete(`/admin/deleteCoupon/${couponId}`)
-                          .then(response => {
-                              if (response.data.message) {
-                                  Swal.fire(
-                                      'Deleted!',
-                                      'Your coupon has been deleted.',
-                                      'success'
-                                  );
-                                  // Remove the deleted coupon row from the table
-                                  couponRow.remove();
-                              }
-                          })
-                          .catch(error => {
-                              Swal.fire({
-                                  title: 'Error!',
-                                  text: error.response.data.error || 'Something went wrong!',
-                                  icon: 'error',
-                                  confirmButtonText: 'OK'
-                              });
-                          });
+        button.addEventListener('click', function () {
+          const couponRow = this.closest('tr');
+          const couponId = couponRow.getAttribute('data-id');
+
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.delete(`/admin/deleteCoupon/${couponId}`)
+                .then(response => {
+                  if (response.data.message) {
+                    Swal.fire(
+                      'Deleted!',
+                      'Your coupon has been deleted.',
+                      'success'
+                    );
+                    // Remove the deleted coupon row from the table
+                    couponRow.remove();
                   }
-              });
+                })
+                .catch(error => {
+                  Swal.fire({
+                    title: 'Error!',
+                    text: error.response.data.error || 'Something went wrong!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                  });
+                });
+            }
           });
+        });
       });
-      </script>
+    </script>
 
 
 

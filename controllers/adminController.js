@@ -4,7 +4,9 @@ const config = require("../config/config");
 const Order = require('../model/orderSchema');
 const Category = require('../model/category');
 const Product = require('../model/product');
-const ExcelJS = require('exceljs');
+const puppeteer = require('puppeteer');
+const ejs = require('ejs');
+const path = require('path');
 
 const securePassword = async (password) => {
     try {
@@ -202,10 +204,10 @@ const generateSalesReport = async (req, res) => {
             calculatedEndDateTime = endOfWeek;
         } else if (reportType === 'Monthly') {
             calculatedStartDateTime = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), 1);
-            calculatedEndDateTime = new Date(endDateTime.getFullYear(), endDateTime.getMonth() + 1, 0);
+            calculatedEndDateTime = new Date(startDateTime.getFullYear(), startDateTime.getMonth() + 1, 0);
         } else if (reportType === 'Yearly') {
             calculatedStartDateTime = new Date(startDateTime.getFullYear(), 0, 1);
-            calculatedEndDateTime = new Date(endDateTime.getFullYear(), 11, 31);
+            calculatedEndDateTime = new Date(startDateTime.getFullYear(), 11, 31, 23, 59, 59, 999);
         }
 
         const orders = await Order.find({
@@ -226,6 +228,7 @@ const generateSalesReport = async (req, res) => {
 };
 
 
+
 const renderSalesReportPage = async (req, res) => {
     try {
         res.render('salesReport', { orders: [] });
@@ -237,38 +240,58 @@ const renderSalesReportPage = async (req, res) => {
 
 
 
-const downloadSalesReport = async (req, res) => {
+
+const downloadSalesReportPDF = async (req, res) => {
     try {
-        const orders = req.body.orders;
+        const { orders } = req.body;
 
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Sales Report');
+        if (!orders || orders.length === 0) {
+            return res.status(400).send('No orders data provided for the report');
+        }
 
-        worksheet.addRow(['User Name', 'Date', 'Email', 'Total', 'Payment Method', 'Status']);
-
-        orders.forEach(order => {
-            worksheet.addRow([
-                order.User ? order.User.name : 'Unknown',
-                order.createdAt,
-                order.User ? order.User.email : 'Unknown',
-                order.totalPrice,
-                order.paymentMethod,
-                order.status
-            ]);
+        const browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            headless: true,
         });
+        const page = await browser.newPage();
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', 'attachment; filename=sales_report.xlsx');
+        const templatePath = path.join(__dirname, '../views/admin/downloadSalesReport.ejs');
+        const html = await ejs.renderFile(templatePath, { orders });
 
-        await workbook.xlsx.write(res);
-        res.end();
+        await page.setContent(html, { waitUntil: 'networkidle0' });
 
-        console.log('Sales report downloaded successfully');
+        const pdf = await page.pdf({ format: 'A4' });
+
+        await browser.close();
+
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': 'attachment; filename="sales_report.pdf"',
+        });
+        res.send(pdf);
+
+        console.log('Sales report PDF downloaded successfully');
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send('Error generating sales report');
+        console.error("Error generating sales report PDF:", error.message);
+        res.status(500).send('Error generating sales report PDF');
     }
 };
+
+
+
+const getSalesReportTemplate = async (req, res) => {
+    try {
+        const { orders } = req.body;
+        res.render('downloadSalesReport', { orders });
+    } catch (error) {
+        console.error("Error in getSalesReportTemplate:", error);
+        res.status(500).send(error.toString());
+    }
+};
+
+
+
+
 
 const admin404Error = async (req, res) => {
     try {
@@ -374,7 +397,8 @@ module.exports = {
     updateUserStatus,
     renderSalesReportPage,
     generateSalesReport,
-    downloadSalesReport,
+    downloadSalesReportPDF,
+    getSalesReportTemplate,
     admin404Error,
     chartYear,
     monthChart

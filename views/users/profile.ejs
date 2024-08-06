@@ -28,23 +28,13 @@
                                     <a href="/allproducts" class="sf-with-ul">Shop</a>
                                 </li>
                                
-                                <li>
-                                    <a href="elements-list.html" class="sf-with-ul">Elements</a>
-                                </li>
+                             
                             </ul><!-- End .menu -->
                         </nav><!-- End .main-nav -->
                     </div><!-- End .header-left -->
 
                     <div class="header-right">
-                        <div class="header-search">
-                            <a href="#" class="search-toggle" role="button" title="Search"><i class="icon-search"></i></a>
-                            <form action="/allproducts" method="get">
-                                <div class="header-search-wrapper">
-                                    <label for="q" class="sr-only">Search</label>
-                                    <input type="search" class="form-control" name="q" id="q" placeholder="Search in..." value="" required>
-                                </div><!-- End .header-search-wrapper -->
-                            </form>
-                        </div><!-- End .header-search -->
+                   
                         
 
                         <div class="dropdown cart-dropdown">
@@ -76,8 +66,7 @@
             <nav aria-label="breadcrumb" class="breadcrumb-nav mb-3">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">My Account</li>
                     </ol>
                 </div><!-- End .container -->
@@ -253,20 +242,39 @@
                                                         </div>
                                                         <hr>
                                                         <h5>Transaction History</h5>
-                                                        <ul id="transaction-list">
-                                                            <% if(userWallet.transactions && userWallet.transactions.length > 0){ %>
-                                                                <% userWallet.transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(transaction => { %>
-                                                                    <li><%= transaction.date.toISOString().split('T')[0] %> - <%= transaction.type %> : ₹<%= transaction.transactionAmount %> (<%= transaction.reason %>)</li>
-                                                                <% }) %>
-                                                            <% } else { %>
-                                                                <li>No transactions found.</li>
-                                                            <% } %>
-                                                        </ul>
+                                                        <table class="table table-striped table-bordered">
+                                                            <thead class="thead-dark">
+                                                                <tr>
+                                                                    <th>Date</th>
+                                                                    <th>Type</th>
+                                                                    <th>Amount</th>
+                                                                    <th>Reason</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <% if (userWallet.transactions && userWallet.transactions.length > 0) { %>
+                                                                    <% userWallet.transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(transaction => { %>
+                                                                        <tr>
+                                                                            <td><%= transaction.date.toISOString().split('T')[0] %></td>
+                                                                            <td><%= transaction.type %></td>
+                                                                            <td>₹<%= transaction.transactionAmount %></td>
+                                                                            <td><%= transaction.reason %></td>
+                                                                        </tr>
+                                                                    <% }) %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td colspan="4" class="text-center">No transactions found.</td>
+                                                                    </tr>
+                                                                <% } %>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div><!-- .End .tab-pane -->
+                                    
+                                    
 
 
 
