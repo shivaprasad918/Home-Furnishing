@@ -205,178 +205,170 @@
 <!-- Add Offer Modal -->
 <div class="modal fade" id="addOfferModal" tabindex="-1" role="dialog" aria-labelledby="addOfferModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addOfferModalLabel">Add Offer</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="addOfferModalLabel">Add Offer</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <form id="offerForm">
+                <p class="text-danger" id="displayerror"></p>
+                  <div class="form-group">
+                      <label for="name">Name:</label>
+                      <input type="text" id="name" name="name" class="form-control" required>
+                      <div class="invalid-feedback" id="nameError"></div>
+                  </div>
+                  <div class="form-group">
+                      <label for="percentage">Percentage:</label>
+                      <input type="number" id="percentage" name="percentage" class="form-control" required>
+                      <div class="invalid-feedback" id="percentageError"></div>
+                  </div>
+                  <div class="form-group">
+                      <label for="startDate">Start Date:</label>
+                      <input type="date" id="startDate" name="startDate" class="form-control" required>
+                      <div class="invalid-feedback" id="startDateError"></div>
+                  </div>
+                  <div class="form-group">
+                      <label for="endDate">End Date:</label>
+                      <input type="date" id="endDate" name="endDate" class="form-control" required>
+                      <div class="invalid-feedback" id="endDateError"></div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Create Offer</button>
+              </form>
+          </div>
       </div>
-      <div class="modal-body">
-        <form id="offerForm">
-          <p class="text-danger" id="displayerror"></p>
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" class="form-control" required>
-            <div class="invalid-feedback" id="nameError"></div>
-          </div>
-          <div class="form-group">
-            <label for="percentage">Percentage:</label>
-            <input type="number" id="percentage" name="percentage" class="form-control" required>
-            <div class="invalid-feedback" id="percentageError"></div>
-          </div>
-          <div class="form-group">
-            <label for="startDate">Start Date:</label>
-            <input type="date" id="startDate" name="startDate" class="form-control" required>
-            <div class="invalid-feedback" id="startDateError"></div>
-          </div>
-          <div class="form-group">
-            <label for="endDate">End Date:</label>
-            <input type="date" id="endDate" name="endDate" class="form-control" required>
-            <div class="invalid-feedback" id="endDateError"></div>
-          </div>
-          <button type="submit" class="btn btn-primary">Create Offer</button>
-        </form>
-      </div>
-    </div>
   </div>
 </div>
 
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('offerForm');
-    
-    const clearErrors = () => {
-      document.getElementById('nameError').textContent = '';
-      document.getElementById('percentageError').textContent = '';
-      document.getElementById('startDateError').textContent = '';
-      document.getElementById('endDateError').textContent = '';
-    };
+      document.getElementById('offerForm').addEventListener('submit', function(event) {
+          event.preventDefault(); // Prevent the form from submitting
+  
+          // Clear previous error messages
+         var nameError =  document.getElementById('displayerror');
+         var percentageError =  document.getElementById('displayerror');
+         var startDateError = document.getElementById('displayerror');
+         var endDateError = document.getElementById('displayerror');
 
-    const displayError = (elementId, message) => {
-      document.getElementById(elementId).textContent = message;
-    };
 
-    const validateForm = () => {
-      const name = document.getElementById('name').value.trim();
-      const percentage = parseInt(document.getElementById('percentage').value);
-      const startDate = new Date(document.getElementById('startDate').value);
-      const endDate = new Date(document.getElementById('endDate').value);
-
-      let isValid = true;
-
-      if (!name) {
-        displayError('nameError', 'Please enter the name.');
-        isValid = false;
-      }
-
-      if (isNaN(percentage) || percentage < 1 || percentage > 100) {
-        displayError('percentageError', 'Please enter a valid percentage between 1 and 100.');
-        isValid = false;
-      }
-
-      if (isNaN(startDate.getTime())) {
-        displayError('startDateError', 'Please enter a valid start date.');
-        isValid = false;
-      }
-
-      if (isNaN(endDate.getTime())) {
-        displayError('endDateError', 'Please enter a valid end date.');
-        isValid = false;
-      }
-
-      if (startDate >= endDate) {
-        displayError('startDateError', 'The start date must be before the end date.');
-        isValid = false;
-      }
-
-      return isValid;
-    };
-
-    const submitForm = (event) => {
-      event.preventDefault(); // Prevent the form from submitting
-
-      clearErrors();
-
-      if (validateForm()) {
-        // Collect form data
-        const formData = new FormData(form);
-        const data = {};
-        formData.forEach((value, key) => {
-          data[key] = value;
-        });
-
-        // Submit form data via axios
-        axios.post('/admin/createOffer', data)
-          .then(response => {
-            if (response.data.message) {
-              Swal.fire({
-                title: 'Success!',
-                text: response.data.message,
-                icon: 'success',
-                confirmButtonText: 'OK'
-              }).then(() => {
-                // Reload the page to update the table
-                location.reload();
+         nameError.textContent = '';
+         percentageError.textContent = '';
+         startDateError.textContent = '';
+         endDateError.textContent = '';
+  
+          // Get form values
+          const name = document.getElementById('name').value.trim();
+          const percentage = parseInt(document.getElementById('percentage').value);
+          const startDate = new Date(document.getElementById('startDate').value);
+          const endDate = new Date(document.getElementById('endDate').value);
+  
+          let isValid = true;
+  
+          // Validation
+          if (!name) {
+              nameError.innerText = 'Please enter the name.';
+              isValid = false;
+          }
+  
+          if (isNaN(percentage) || percentage < 1 || percentage > 100) {
+              percentageError.innerText = 'Please enter a valid percentage between 1 and 100.';
+              isValid = false;
+          }
+  
+          if (isNaN(startDate.getTime())) {
+              startDateError.innerText = 'Please enter a valid start date.';
+              isValid = false;
+          }
+  
+          if (isNaN(endDate.getTime())) {
+              endDateError.innerText = 'Please enter a valid end date.';
+              isValid = false;
+          }
+  
+          if (startDate >= endDate) {
+              startDateError.innerText = 'The start date must be before the end date.';
+              isValid = false;
+          }
+  
+          if (isValid) {
+              // Collect form data
+              const formData = new FormData(this);
+              const data = {};
+              formData.forEach((value, key) => {
+                  data[key] = value;
               });
-            }
-          })
-          .catch(error => {
-            Swal.fire({
-              title: 'Error!',
-              text: error.response.data.error || 'Something went wrong!',
-              icon: 'error',
-              confirmButtonText: 'OK'
-            });
-          });
-      }
-    };
-
-    const deleteOffer = (event) => {
-      const offerRow = event.target.closest('tr');
-      const offerId = offerRow.getAttribute('data-id');
-
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.delete(`/admin/deleteOffer/${offerId}`)
-            .then(response => {
-              if (response.data.message) {
-                Swal.fire(
-                  'Deleted!',
-                  'Your offer has been deleted.',
-                  'success'
-                );
-                offerRow.remove();
-              }
-            })
-            .catch(error => {
-              Swal.fire({
-                title: 'Error!',
-                text: error.response.data.error || 'Something went wrong!',
-                icon: 'error',
-                confirmButtonText: 'OK'
-              });
-            });
-        }
+  
+              // Submit form data via axios
+              axios.post('/admin/createOffer', data)
+                  .then(response => {
+                      if (response.data.message) {
+                          Swal.fire({
+                              title: 'Success!',
+                              text: response.data.message,
+                              icon: 'success',
+                              confirmButtonText: 'OK'
+                          }).then(() => {
+                              // Reload the page to update the table
+                              location.reload();
+                          });
+                      }
+                  })
+                  .catch(error => {
+                      Swal.fire({
+                          title: 'Error!',
+                          text: error.response.data.error || 'Something went wrong!',
+                          icon: 'error',
+                          confirmButtonText: 'OK'
+                      });
+                  });
+          }
       });
-    };
-
-    form.addEventListener('submit', submitForm);
-
-    document.querySelectorAll('.delete-offer').forEach(button => {
-      button.addEventListener('click', deleteOffer);
-    });
+  
+      // Delete offer event listener
+      document.querySelectorAll('.delete-offer').forEach(button => {
+          button.addEventListener('click', function() {
+              const offerRow = this.closest('tr');
+              const offerId = offerRow.getAttribute('data-id');
+  
+              Swal.fire({
+                  title: 'Are you sure?',
+                  text: "You won't be able to revert this!",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Yes, delete it!'
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      axios.delete(`/admin/deleteOffer/${offerId}`)
+                          .then(response => {
+                              if (response.data.message) {
+                                  Swal.fire(
+                                      'Deleted!',
+                                      'Your offer has been deleted.',
+                                      'success'
+                                  );
+                                  offerRow.remove();
+                              }
+                          })
+                          .catch(error => {
+                              Swal.fire({
+                                  title: 'Error!',
+                                  text: error.response.data.error || 'Something went wrong!',
+                                  icon: 'error',
+                                  confirmButtonText: 'OK'
+                              });
+                          });
+                  }
+              });
+          });
+      });
   });
-</script>
-
+  </script>
   
 
 
