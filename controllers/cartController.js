@@ -69,6 +69,7 @@ const addToCart = async (req, res) => {
             cart.grandTotal = cart.product.reduce((total, item) => total + item.total, 0);
             await cart.save();
         }
+        
 
         res.json({ success: true, cart });
     } catch (error) {
@@ -267,7 +268,6 @@ const addAddressCheck = async (req, res) => {
             return res.status(400).send('Address is already used');
         }
 
-
         const newAddress = {
             name,
             phone,
@@ -281,12 +281,13 @@ const addAddressCheck = async (req, res) => {
         user.address.push(newAddress);
         await user.save();
 
-        res.redirect('/checkout');
+        res.redirect('/checkout?success=1'); // Redirect with success query parameter
     } catch (error) {
         console.log(error);
         res.status(500).send('Server Error');
     }
 };
+
 
 
 const deleteAddressCheck = async (req, res) => {

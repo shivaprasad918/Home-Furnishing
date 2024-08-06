@@ -148,7 +148,7 @@
                                             <%= product.productId.price.toFixed(2) %>
                                         </td>
                                         <td class="stock-col"><span class="in-stock">In stock</span></td>
-                                        <td><button class="btn btn-primary" onclick="addToCart('<%= product._id %>', event)">Add to Cart</button></td>
+                                        <td><button class="btn btn-primary" onclick="addToCart('<%= product.productId._id %>', event)">Add to Cart</button></td>
                                         <td class="remove-col">
                                             <button class="btn-remove">
                                                 <i class="icon-close"></i>
@@ -165,87 +165,101 @@
                     </table>
                 </div>
             </div>
-            
-
         </main><!-- End .main -->
+
+
+
+
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
         <script>
+            function addToCart(productId, event) {
+                event.preventDefault();
+                const data = { productId: productId };
+                axios.post('/addtoCart', data)
+                    .then(response => {
+                        console.log(response);
+                        if (response.data.success) {
+                            Swal.fire("Success", "Product added to cart!", "success");
+                          
+                          
+                        } else {
+                            Swal.fire("Error", response.data.message, "error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        if (error.response) {
+                            if (error.response.status === 400 && error.response.data.message === 'Product out of stock') {
+                                Swal.fire("Error", "Product out of stock", "error");
+                            } else if (error.response.status === 404 && error.response.data.message === 'Product not found') {
+                                Swal.fire("Error", "Product not found", "error");
+                            } else if (error.response.status === 401 && error.response.data.message === 'User not authenticated') {
+                                Swal.fire("Error", "User not authenticated", "error");
+                            } else {
+                                Swal.fire("Error", "Something went wrong!", "error");
+                            }
+                        } else {
+                            Swal.fire("Error", "Something went wrong!", "error");
+                        }
+                    });
+            }
+
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.btn-remove').forEach(button => {
                     button.addEventListener('click', async (event) => {
                         const productId = event.target.closest('tr').dataset.productId;
 
-                        try {
-                            const response = await fetch(`/removeWishlistProduct/${productId}`, {
-                                method: 'DELETE',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                            });
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Do you want to remove this product from your wishlist?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, remove it!'
+                        }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                try {
+                                    const response = await fetch(`/removeWishlistProduct/${productId}`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                    });
 
-                            const result = await response.json();
+                                    const result = await response.json();
 
-                            if (response.ok) {
-                                // Remove the product row from the table
-                                event.target.closest('tr').remove();
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success',
-                                    text: result.message,
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: result.message,
-                                });
+                                    if (response.ok) {
+                                        // Remove the product row from the table
+                                        event.target.closest('tr').remove();
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Removed!',
+                                            text: result.message,
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: result.message,
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.error('Error:', error);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Failed to remove product from wishlist',
+                                    });
+                                }
                             }
-                        } catch (error) {
-                            console.error('Error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Failed to remove product from wishlist',
-                            });
-                        }
+                        });
                     });
                 });
             });
         </script>
-
-
-<script>
-     function addToCart(productId) {
-    const data = { productId: productId };
-    axios.post('/addtoCart', data)
-        .then(response => {
-            console.log(response);
-            swal("Success", "Product added to cart!", "success");
-        })
-        .catch(error => {
-            console.error(error);
-            if (error.response) {
-                if (error.response.status === 400 && error.response.data.message === 'Product out of stock') {
-                    swal("Error", "Product out of stock", "error");
-                } else if (error.response.status === 404 && error.response.data.message === 'Product not found') {
-                    swal("Error", "Product not found", "error");
-                } else if (error.response.status === 401 && error.response.data.message === 'User not authenticated') {
-                    swal("Error", "User not authenticated", "error");
-                } else {
-                    swal("Error", "Something went wrong!", "error");
-                }
-            } else {
-                swal("Error", "Something went wrong!", "error");
-            }
-        });
-}
-
-
-
-</script>
 
 
 
@@ -255,8 +269,7 @@
                     <div class="row">
                         <div class="col-sm-6 col-lg-3">
                             <div class="widget widget-about">
-                                <img src="user/assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
-                                    height="25">
+                                <h3 class="footer-logo" alt="Footer Logo" width="105" height="25">Home Furnishing </h3>
                                 <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate
                                     magna eros eu erat. </p>
 
@@ -321,15 +334,7 @@
                 </div><!-- End .container -->
             </div><!-- End .footer-middle -->
 
-            <div class="footer-bottom">
-                <div class="container">
-                    <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
-                    <!-- End .footer-copyright -->
-                    <figure class="footer-payments">
-                        <img src="user/assets/images/payments.png" alt="Payment methods" width="272" height="20">
-                    </figure><!-- End .footer-payments -->
-                </div><!-- End .container -->
-            </div><!-- End .footer-bottom -->
+
         </footer><!-- End .footer -->
     </div><!-- End .page-wrapper -->
     <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
@@ -337,27 +342,7 @@
     <!-- Mobile Menu -->
     <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
 
-    <div class="mobile-menu-container">
-        <div class="mobile-menu-wrapper">
-            <span class="mobile-menu-close"><i class="icon-close"></i></span>
 
-            <form action="#" method="get" class="mobile-search">
-                <label for="mobile-search" class="sr-only">Search</label>
-                <input type="search" class="form-control" name="mobile-search" id="mobile-search"
-                    placeholder="Search in..." required>
-                <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
-            </form>
-
-
-
-            <div class="social-icons">
-                <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
-            </div><!-- End .social-icons -->
-        </div><!-- End .mobile-menu-wrapper -->
-    </div><!-- End .mobile-menu-container -->
 
 
     <!-- Plugins JS File -->

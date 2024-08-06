@@ -518,13 +518,6 @@ const loadProfile = async (req, res) => {
 
 
 
-
-
-
-
-
-
-
 const updateProfile = async (req, res) => {
     try {
         const userId = req.session.user_id;
@@ -533,35 +526,37 @@ const updateProfile = async (req, res) => {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).render('404')
+            return res.status(404).render('404');
         }
 
-        // Update name, email, and mobile
         user.name = name;
         user.mobile = number;
 
-        // Check if user wants to update the password
+        let passwordChanged = false;
+
         if (password && newpassword && confirmpassword) {
-            // Verify current password
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
-                return res.status(400).send('Current password is incorrect');
+                return res.status(400).render('profile', { message: 'Current password is incorrect' });
             }
 
-            // Check if new password and confirm password match
             if (newpassword !== confirmpassword) {
-                return res.status(400).send('New passwords do not match');
+                return res.status(400).render('profile', { message: 'New passwords do not match' });
             }
 
-            // Hash the new password
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(newpassword, salt);
+
+            passwordChanged = true;
         }
 
-        // Save the updated user
         await user.save();
 
-        res.redirect('profile');
+        if (passwordChanged) {
+            return res.redirect('/profile?success=1'); 
+        }
+
+        res.redirect('/profile');
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');

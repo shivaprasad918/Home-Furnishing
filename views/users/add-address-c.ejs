@@ -102,6 +102,21 @@
             </div>
         </main>
         
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('success')) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Address successfully added.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        </script>
         
         
         
