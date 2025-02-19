@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sales Report</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sales Report</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Date</th>
+                <th>Email</th>
+                <th>Total</th>
+                <th>Payment Method</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% orders.forEach(order => { %>
+                <tr>
+                    <td><%= order.User ? order.User.name : 'Unknown' %></td>
+                    <td><%= new Date(order.createdAt).toDateString() %></td>
+                    <td><%= order.User ? order.User.email : 'Unknown' %></td>
+                    <td><%= order.totalPrice %></td>
+                    <td><%= order.paymentMethod %></td>
+                    <td><%= order.status %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</body>
+</html>

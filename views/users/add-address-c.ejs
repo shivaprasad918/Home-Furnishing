@@ -1,0 +1,313 @@
+<%- include('../layouts/header.ejs') %>
+ 
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="header-top">
+                <div class="container">
+                    <div class="header-left">
+                        <div class="header-dropdown">
+                            
+                        </div><!-- End .header-dropdown -->
+
+                 
+                    </div><!-- End .header-left -->
+
+                 
+                </div><!-- End .container -->
+            </div><!-- End .header-top -->
+
+            <div class="header-middle sticky-header">
+                <div class="container">
+                    <div class="header-left">
+                        <button class="mobile-menu-toggler">
+                            <span class="sr-only">Toggle mobile menu</span>
+                            <i class="icon-bars"></i>
+                        </button>
+                        <a href="index.html" class="logo">
+                            <img src="user/assets/images/logo.png" alt="Molla Logo" width="105" height="25">
+                        </a>
+                        <div class="header-left">
+
+
+                            <nav class="main-nav">
+                                <ul class="menu sf-arrows">
+                                    <li class="megamenu-container active">
+                                        <a href="/" class="sf-with-ul">Home</a>
+    
+                                    </li>
+                                    <li>
+                                        <a href="/allproducts" class="sf-with-ul">Shop</a>
+                                    </li>
+                                    <li>
+                                        <a href="/profile" class="sf-with-ul">Profile</a>
+    
+                                    </li>
+                                </ul><!-- End .menu -->
+                            </nav><!-- End .main-nav -->
+                        </div><!-- End .header-left -->
+                    </div><!-- End .header-left -->
+
+              
+                </div><!-- End .container -->
+            </div><!-- End .header-middle -->
+        </header><!-- End .header -->
+
+
+ 
+        <main class="main">
+            <div class="container" style="max-width: 800px; padding: 30px;">
+                <form id="checkout-form" action="/add-address-c" method="post" novalidate>
+                    <div class="form-section">
+                        <h2 class="checkout-title">Billing Details</h2>
+                        <div class="form-group">
+                            <label for="first-name">Name *</label>
+                            <input type="text" class="form-control" id="first-name" name="name" required>
+                            <div class="error-message" id="name-error">Please enter your name.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required pattern="^\d{10}$">
+                            <div class="error-message" id="phone-error">Please enter a valid 10-digit phone number.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="company-name">Building Name/House Name *</label>
+                            <input type="text" class="form-control" id="company-name" name="buildingName" required>
+                            <div class="error-message" id="buildingName-error">Please enter your building or house name.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" class="form-control" id="city" name="city" required>
+                            <div class="error-message" id="city-error">Please enter your city.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="district">District *</label>
+                            <input type="text" class="form-control" id="district" name="district" required>
+                            <div class="error-message" id="district-error">Please enter your district.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State *</label>
+                            <input type="text" class="form-control" id="state" name="state" required>
+                            <div class="error-message" id="state-error">Please enter your state.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="postcode">Pincode *</label>
+                            <input type="text" class="form-control" id="postcode" name="postcode" required pattern="^\d{6}$">
+                            <div class="error-message" id="postcode-error">Please enter a valid 6-digit pincode.</div>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary">Save Address</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+        
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('success')) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Address successfully added.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        </script>
+        
+        
+        
+
+
+
+        <footer class="footer">
+        	<div class="footer-middle">
+	            <div class="container">
+	            	<div class="row">
+	            		<div class="col-sm-6 col-lg-3">
+	            			<div class="widget widget-about">
+	            				<img src="user/assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105" height="25">
+	            				<p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. </p>
+
+	            				<div class="social-icons">
+	            					<a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
+	            					<a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
+	            					<a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
+	            					<a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+	            					<a href="#" class="social-icon" target="_blank" title="Pinterest"><i class="icon-pinterest"></i></a>
+	            				</div><!-- End .soial-icons -->
+	            			</div><!-- End .widget about-widget -->
+	            		</div><!-- End .col-sm-6 col-lg-3 -->
+
+	            		<div class="col-sm-6 col-lg-3">
+	            			<div class="widget">
+	            				<h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+	            				<ul class="widget-list">
+	            					<li><a href="about.html">About Molla</a></li>
+	            					<li><a href="#">How to shop on Molla</a></li>
+	            					<li><a href="#">FAQ</a></li>
+	            					<li><a href="contact.html">Contact us</a></li>
+	            					<li><a href="login.html">Log in</a></li>
+	            				</ul><!-- End .widget-list -->
+	            			</div><!-- End .widget -->
+	            		</div><!-- End .col-sm-6 col-lg-3 -->
+
+	            		<div class="col-sm-6 col-lg-3">
+	            			<div class="widget">
+	            				<h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+	            				<ul class="widget-list">
+	            					<li><a href="#">Payment Methods</a></li>
+	            					<li><a href="#">Money-back guarantee!</a></li>
+	            					<li><a href="#">Returns</a></li>
+	            					<li><a href="#">Shipping</a></li>
+	            					<li><a href="#">Terms and conditions</a></li>
+	            					<li><a href="#">Privacy Policy</a></li>
+	            				</ul><!-- End .widget-list -->
+	            			</div><!-- End .widget -->
+	            		</div><!-- End .col-sm-6 col-lg-3 -->
+
+	            		<div class="col-sm-6 col-lg-3">
+	            			<div class="widget">
+	            				<h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+	            				<ul class="widget-list">
+	            					<li><a href="#">Sign In</a></li>
+	            					<li><a href="cart.html">View Cart</a></li>
+	            					<li><a href="#">My Wishlist</a></li>
+	            					<li><a href="#">Track My Order</a></li>
+	            					<li><a href="#">Help</a></li>
+	            				</ul><!-- End .widget-list -->
+	            			</div><!-- End .widget -->
+	            		</div><!-- End .col-sm-6 col-lg-3 -->
+	            	</div><!-- End .row -->
+	            </div><!-- End .container -->
+	        </div><!-- End .footer-middle -->
+
+	        <div class="footer-bottom">
+	        	<div class="container">
+	        		<p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p><!-- End .footer-copyright -->
+	        		<figure class="footer-payments">
+	        			<img src="user/assets/images/payments.png" alt="Payment methods" width="272" height="20">
+	        		</figure><!-- End .footer-payments -->
+	        	</div><!-- End .container -->
+	        </div><!-- End .footer-bottom -->
+        </footer><!-- End .footer -->
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <div class="mobile-menu-container">
+        <div class="mobile-menu-wrapper">
+            <span class="mobile-menu-close"><i class="icon-close"></i></span>
+
+            <form action="#" method="get" class="mobile-search">
+                <label for="mobile-search" class="sr-only">Search</label>
+                <input type="search" class="form-control" name="mobile-search" id="mobile-search" placeholder="Search in..." required>
+                <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
+            </form>
+            
+          
+
+            <div class="social-icons">
+                <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+            </div><!-- End .social-icons -->
+        </div><!-- End .mobile-menu-wrapper -->
+    </div><!-- End .mobile-menu-container -->
+
+
+
+<!---------------validation-->
+
+
+<script>
+    document.getElementById('checkout-form').addEventListener('submit', function(event) {
+        let isValid = true;
+
+        // Validate Name
+        const nameField = document.getElementById('first-name');
+        if (!nameField.value.trim()) {
+            isValid = false;
+            document.getElementById('name-error').style.display = 'block';
+        } else {
+            document.getElementById('name-error').style.display = 'none';
+        }
+
+        // Validate Phone Number
+        const phoneField = document.getElementById('phone');
+        const phonePattern = /^\d{10}$/;
+        if (!phonePattern.test(phoneField.value)) {
+            isValid = false;
+            document.getElementById('phone-error').style.display = 'block';
+        } else {
+            document.getElementById('phone-error').style.display = 'none';
+        }
+
+        // Validate Building Name/House Name
+        const buildingNameField = document.getElementById('company-name');
+        if (!buildingNameField.value.trim()) {
+            isValid = false;
+            document.getElementById('buildingName-error').style.display = 'block';
+        } else {
+            document.getElementById('buildingName-error').style.display = 'none';
+        }
+
+        // Validate City
+        const cityField = document.getElementById('city');
+        if (!cityField.value.trim()) {
+            isValid = false;
+            document.getElementById('city-error').style.display = 'block';
+        } else {
+            document.getElementById('city-error').style.display = 'none';
+        }
+
+        // Validate District
+        const districtField = document.getElementById('district');
+        if (!districtField.value.trim()) {
+            isValid = false;
+            document.getElementById('district-error').style.display = 'block';
+        } else {
+            document.getElementById('district-error').style.display = 'none';
+        }
+
+        // Validate State
+        const stateField = document.getElementById('state');
+        if (!stateField.value.trim()) {
+            isValid = false;
+            document.getElementById('state-error').style.display = 'block';
+        } else {
+            document.getElementById('state-error').style.display = 'none';
+        }
+
+        // Validate Pincode
+        const postcodeField = document.getElementById('postcode');
+        const postcodePattern = /^\d{6}$/;
+        if (!postcodePattern.test(postcodeField.value)) {
+            isValid = false;
+            document.getElementById('postcode-error').style.display = 'block';
+        } else {
+            document.getElementById('postcode-error').style.display = 'none';
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+</script>
+<style>
+    .error-message {
+        color: red;
+        display: none;
+    }
+</style>
+ 
+<%- include('../layouts/footer.ejs') %>

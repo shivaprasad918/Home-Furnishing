@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/checkout.html  22 Nov 2019 09:55:06 GMT -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Molla - Bootstrap eCommerce Template</title>
+    <meta name="keywords" content="HTML5 Template">
+    <meta name="description" content="Molla - Bootstrap eCommerce Template">
+    <meta name="author" content="p-themes">
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="user/assets/images/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="user/assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="user/assets/images/icons/favicon-16x16.png">
+    <link rel="manifest" href="user/assets/images/icons/site.html">
+    <link rel="mask-icon" href="user/assets/images/icons/safari-pinned-tab.svg" color="#666666">
+    <link rel="shortcut icon" href="user/assets/images/icons/favicon.ico">
+    <meta name="apple-mobile-web-app-title" content="Molla">
+    <meta name="application-name" content="Molla">
+    <meta name="msapplication-TileColor" content="#cc9966">
+    <meta name="msapplication-config" content="user/assets/images/icons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Plugins CSS File -->
+    <link rel="stylesheet" href="user/assets/css/bootstrap.min.css">
+    <!-- Main CSS File -->
+    <link rel="stylesheet" href="user/assets/css/style.css">
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="header-top">
+                <div class="container">
+                    <div class="header-left">
+                        <div class="header-dropdown">
+                            
+                        </div><!-- End .header-dropdown -->
+
+                 
+                    </div><!-- End .header-left -->
+
+                 
+                </div><!-- End .container -->
+            </div><!-- End .header-top -->
+
+            <div class="header-middle sticky-header">
+                <div class="container">
+                    <div class="header-left">
+                        <button class="mobile-menu-toggler">
+                            <span class="sr-only">Toggle mobile menu</span>
+                            <i class="icon-bars"></i>
+                        </button>
+                        <a href="index.html" class="logo">
+                            <img src="user/assets/images/logo.png" alt="Molla Logo" width="105" height="25">
+                        </a>
+                        <div class="header-left">
+
+
+                            <nav class="main-nav">
+                                <ul class="menu sf-arrows">
+                                    <li class="megamenu-container active">
+                                        <a href="/" class="sf-with-ul">Home</a>
+    
+                                    </li>
+                                    <li>
+                                        <a href="/allproducts" class="sf-with-ul">Shop</a>
+                                    </li>
+                                    <li>
+                                        <a href="/profile" class="sf-with-ul">Profile</a>
+    
+                                    </li>
+                                </ul><!-- End .menu -->
+                            </nav><!-- End .main-nav -->
+                        </div><!-- End .header-left -->
+                    </div><!-- End .header-left -->
+
+              
+                </div><!-- End .container -->
+            </div><!-- End .header-middle -->
+        </header><!-- End .header -->
+
+
+
+
+        <main class="main">
+            <div class="container">
+                <form id="addressForm" action="/add-address" method="post" class="compact-form">
+                    <div class="form-section">
+                        <h2 class="checkout-title">Billing Details</h2>
+                        <div class="form-group">
+                            <label for="first-name">Name *</label>
+                            <input type="text" class="form-control" id="first-name" name="name" required
+                                   pattern="[a-zA-Z\s]+" title="Name should only contain letters and spaces."
+                                   autocomplete="off">
+                            <div class="invalid-feedback">Please enter a valid name (letters and spaces only).</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required pattern="[0-9]{10}"
+                                   title="Phone number should be 10 digits."
+                                   autocomplete="off">
+                            <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="building-name">Building Name/House Name *</label>
+                            <input type="text" class="form-control" id="building-name" name="buildingName" required
+                                   autocomplete="off">
+                            <div class="invalid-feedback">Please enter the building or house name.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" class="form-control" id="city" name="city" required
+                                   autocomplete="off">
+                            <div class="invalid-feedback">Please enter the city.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="district">District *</label>
+                            <input type="text" class="form-control" id="district" name="district" required
+                                   autocomplete="off">
+                            <div class="invalid-feedback">Please enter the district.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State *</label>
+                            <input type="text" class="form-control" id="state" name="state" required
+                                   autocomplete="off">
+                            <div class="invalid-feedback">Please enter the state.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="postcode">Pincode *</label>
+                            <input type="text" class="form-control" id="postcode" name="postcode" required
+                                   pattern="[0-9]{6}" title="Pincode should be 6 digits."
+                                   autocomplete="off">
+                            <div class="invalid-feedback">Please enter a valid 6-digit pincode.</div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Save Address</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+        
+        <script>
+            document.getElementById('addressForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the form from submitting initially
+        
+                if (validateForm()) {
+                    this.submit(); // If validation passes, submit the form
+                }
+            });
+        
+            function validateForm() {
+                let isValid = true;
+        
+                // Reset all input fields' validity
+                document.querySelectorAll('.form-control').forEach(function (input) {
+                    input.classList.remove('is-invalid');
+                });
+        
+                // Validate each field
+                let nameInput = document.getElementById('first-name');
+                let phoneInput = document.getElementById('phone');
+                let buildingNameInput = document.getElementById('building-name');
+                let cityInput = document.getElementById('city');
+                let districtInput = document.getElementById('district');
+                let stateInput = document.getElementById('state');
+                let postcodeInput = document.getElementById('postcode');
+        
+                // Trim inputs to remove leading/trailing spaces
+                nameInput.value = nameInput.value.trim();
+                buildingNameInput.value = buildingNameInput.value.trim();
+                cityInput.value = cityInput.value.trim();
+                districtInput.value = districtInput.value.trim();
+                stateInput.value = stateInput.value.trim();
+                postcodeInput.value = postcodeInput.value.trim();
+        
+                // Validate each field
+                if (!nameInput.checkValidity() || nameInput.value.length === 0) {
+                    isValid = false;
+                    nameInput.classList.add('is-invalid');
+                }
+        
+                if (!phoneInput.checkValidity() || phoneInput.value.length === 0) {
+                    isValid = false;
+                    phoneInput.classList.add('is-invalid');
+                }
+        
+                if (!buildingNameInput.checkValidity() || buildingNameInput.value.length === 0) {
+                    isValid = false;
+                    buildingNameInput.classList.add('is-invalid');
+                }
+        
+                if (!cityInput.checkValidity() || cityInput.value.length === 0) {
+                    isValid = false;
+                    cityInput.classList.add('is-invalid');
+                }
+        
+                if (!districtInput.checkValidity() || districtInput.value.length === 0) {
+                    isValid = false;
+                    districtInput.classList.add('is-invalid');
+                }
+        
+                if (!stateInput.checkValidity() || stateInput.value.length === 0) {
+                    isValid = false;
+                    stateInput.classList.add('is-invalid');
+                }
+        
+                if (!postcodeInput.checkValidity() || postcodeInput.value.length === 0) {
+                    isValid = false;
+                    postcodeInput.classList.add('is-invalid');
+                }
+        
+                return isValid;
+            }
+        </script>
+       
+
+       <style>
+        .compact-form {
+            max-width: 400px; /* Adjust width as needed */
+            padding: 20px; /* Adjust padding as needed */
+            background-color: #f5f5f5; /* Optional: Add background color */
+            border: 1px solid #ccc; /* Optional: Add border */
+            border-radius: 8px; /* Optional: Add border radius */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add box shadow */
+            margin: auto; /* Center the form horizontally */
+        }
+
+        /* Style adjustments for form groups */
+        .compact-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        /* Adjust form control widths if necessary */
+        .compact-form .form-control {
+            width: calc(100% - 20px); /* Adjust width as needed */
+        }
+
+        /* Optional: Center align buttons */
+        .compact-form .button-group {
+            text-align: center;
+            margin-top: 20px; /* Adjust spacing */
+        }
+
+        /* Optional: Adjust button margins */
+        .compact-form .button-group button {
+            margin-right: 10px; /* Adjust spacing between buttons */
+        }
+
+        .is-invalid {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            display: none;
+            font-size: 80%;
+            margin-top: .25rem;
+        }
+
+        .is-invalid+.invalid-feedback {
+            display: block;
+        }
+    </style>
+
+
+
+        <footer class="footer">
+            <div class="footer-middle">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget widget-about">
+                                <img src="user/assets/images/logo.png" class="footer-logo" alt="Footer Logo" width="105"
+                                    height="25">
+                                <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate
+                                    magna eros eu erat. </p>
+
+                                <div class="social-icons">
+                                    <a href="#" class="social-icon" target="_blank" title="Facebook"><i
+                                            class="icon-facebook-f"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Twitter"><i
+                                            class="icon-twitter"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Instagram"><i
+                                            class="icon-instagram"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Youtube"><i
+                                            class="icon-youtube"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
+                                            class="icon-pinterest"></i></a>
+                                </div><!-- End .soial-icons -->
+                            </div><!-- End .widget about-widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="about.html">About Molla</a></li>
+                                    <li><a href="#">How to shop on Molla</a></li>
+                                    <li><a href="#">FAQ</a></li>
+                                    <li><a href="contact.html">Contact us</a></li>
+                                    <li><a href="login.html">Log in</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="#">Payment Methods</a></li>
+                                    <li><a href="#">Money-back guarantee!</a></li>
+                                    <li><a href="#">Returns</a></li>
+                                    <li><a href="#">Shipping</a></li>
+                                    <li><a href="#">Terms and conditions</a></li>
+                                    <li><a href="#">Privacy Policy</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="#">Sign In</a></li>
+                                    <li><a href="cart.html">View Cart</a></li>
+                                    <li><a href="#">My Wishlist</a></li>
+                                    <li><a href="#">Track My Order</a></li>
+                                    <li><a href="#">Help</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+                    </div><!-- End .row -->
+                </div><!-- End .container -->
+            </div><!-- End .footer-middle -->
+
+            <div class="footer-bottom">
+                <div class="container">
+                    <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
+                    <!-- End .footer-copyright -->
+                    <figure class="footer-payments">
+                        <img src="user/assets/images/payments.png" alt="Payment methods" width="272" height="20">
+                    </figure><!-- End .footer-payments -->
+                </div><!-- End .container -->
+            </div><!-- End .footer-bottom -->
+        </footer><!-- End .footer -->
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <div class="mobile-menu-container">
+        <div class="mobile-menu-wrapper">
+            <span class="mobile-menu-close"><i class="icon-close"></i></span>
+
+            <form action="#" method="get" class="mobile-search">
+                <label for="mobile-search" class="sr-only">Search</label>
+                <input type="search" class="form-control" name="mobile-search" id="mobile-search"
+                    placeholder="Search in..." required>
+                <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
+            </form>
+
+
+
+            <div class="social-icons">
+                <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+            </div><!-- End .social-icons -->
+        </div><!-- End .mobile-menu-wrapper -->
+    </div><!-- End .mobile-menu-container -->
+
+
+
+    <!-- Plugins JS File -->
+    <script src="user/assets/js/jquery.min.js"></script>
+    <script src="user/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="user/assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="user/assets/js/jquery.waypoints.min.js"></script>
+    <script src="user/assets/js/superfish.min.js"></script>
+    <script src="user/assets/js/owl.carousel.min.js"></script>
+    <!-- Main JS File -->
+    <script src="user/assets/js/main.js"></script>
+</body>
+
+
+<!-- molla/checkout.html  22 Nov 2019 09:55:06 GMT -->
+
+</html>

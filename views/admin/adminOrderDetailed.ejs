@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Corona Admin</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="/admin/assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/admin/assets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="/admin/assets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="/admin/assets/images/favicon.png" />
+
+</head>
+
+<body>
+    <div class="container-scroller">
+        <!-- partial:../../partials/_sidebar.html -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+                <a class="sidebar-brand brand-logo" href="index.html"><img src="/admin/assets/images/logo.svg"
+                        alt="logo" /></a>
+                <a class="sidebar-brand brand-logo-mini" href="index.html"><img src="/admin/assets/images/logo-mini.svg"
+                        alt="logo" /></a>
+            </div>
+            <ul class="nav">
+                <li class="nav-item profile">
+                    <div class="profile-desc">
+                        <div class="profile-pic">
+                            <div class="count-indicator">
+                                <img class="img-xs rounded-circle " src="/admin/assets/images/faces/face15.jpg" alt="">
+                                <span class="count bg-success"></span>
+                            </div>
+                            <div class="profile-name">
+                                <h5 class="mb-0 font-weight-normal">Shivaprasad</h5>
+                                <span>Gold Member</span>
+                            </div>
+                        </div>
+                        <a href="#" id="profile-dropdown" data-toggle="dropdown"><i
+                                class="mdi mdi-dots-vertical"></i></a>
+                        <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list"
+                            aria-labelledby="profile-dropdown">
+                            <a href="#" class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-dark rounded-circle">
+                                        <i class="mdi mdi-settings text-primary"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <p class="preview-subject ellipsis mb-1 text-small">Account settings</p>
+                                </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-dark rounded-circle">
+                                        <i class="mdi mdi-onepassword  text-info"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
+                                </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-dark rounded-circle">
+                                        <i class="mdi mdi-calendar-today text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <p class="preview-subject ellipsis mb-1 text-small">To-do list</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item nav-category">
+                    <span class="nav-link">Navigation</span>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/dashboard">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-speedometer"></i>
+                        </span>
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/User">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-laptop"></i>
+                        </span>
+                        <span class="menu-title">User</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/allCategory">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-chart-bar"></i>
+                        </span>
+                        <span class="menu-title">Category</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/category">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-table-large"></i>
+                        </span>
+                        <span class="menu-title">Add Category</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/allProduct">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">All products</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/addProduct">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Add products</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/order">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/coupon">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Coupons</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/offer">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Offer</span>
+                    </a>
+                </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="/admin/salesReport">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-security"></i>
+                        </span>
+                        <span class="menu-title">Sales Report</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="row">
+                    <div class="col-12 grid-margin stretch-card">
+                        <div class="card corona-gradient-card">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 grid-margin">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Order Details</h4>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Product Name</th>
+                                                <th>Original Price</th>
+                                                <th>Quantity</th>
+                                                <% if (order.coupon) { %>
+                                                    <th>Coupon Discount Price</th>
+                                                    <% } %>
+                                                        <th>Status</th>
+                                                        <th>Return Request</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% order.products.forEach((product, index)=> { %>
+                                                <tr>
+                                                    <td>
+                                                        <%= product.name %>
+                                                    </td>
+                                                    <td>
+                                                        <%= product.price.toFixed(2) %>
+                                                    </td>
+                                                    <td>
+                                                        <%= product.quantity %>
+                                                    </td>
+                                                    <% if (order.coupon) { %>
+                                                        <td>
+                                                            <%= product.total.toFixed(2) %>
+                                                        </td>
+                                                        <% } %>
+                                                            <td>
+                                                                <% if (product.status !=='delivered' ) { %>
+                                                                    <form>
+                                                                        <input type="hidden" name="orderId"
+                                                                            value="<%= order._id %>">
+                                                                        <select name="status" class="custom-select"
+                                                                            data-order-id="<%= order._id %>"
+                                                                            data-product-id="<%= product._id %>">
+                                                                            <option value="pending"
+                                                                                <%=product.status==='pending'
+                                                                                ? 'selected' : '' %>>Pending</option>
+                                                                            <option value="shipped"
+                                                                                <%=product.status==='shipped'
+                                                                                ? 'selected' : '' %>>Shipped</option>
+                                                                            <option value="delivered"
+                                                                                <%=product.status==='delivered'
+                                                                                ? 'selected' : '' %>>Delivered</option>
+                                                                            <option value="cancelled"
+                                                                                <%=product.status==='cancelled'
+                                                                                ? 'selected' : '' %>>Cancelled</option>
+                                                                            <option value="returned"
+                                                                                <%=product.status==='returned'
+                                                                                ? 'selected' : '' %>>Returned</option>
+                                                                            <option value="rejected"
+                                                                                <%=product.status==='rejected'
+                                                                                ? 'selected' : '' %>>Rejected</option>
+
+                                                                        </select>
+                                                                    </form>
+                                                                    <% } else { %>
+                                                                        <select class="custom-select" disabled>
+                                                                            <option selected>Delivered</option>
+                                                                        </select>
+                                                                        <% } %>
+                                                            </td>
+                                                            <td>
+                                                                <% if (product.status==='return-requested' ||
+                                                                    product.status==='pending' ) { %>
+                                                                    <button type="button"
+                                                                        class="btn <%= product.status === 'return-requested' ? 'btn-danger' : 'btn-success' %> return-request"
+                                                                        data-order-id="<%= order._id %>"
+                                                                        data-product-id="<%= product._id %>">
+                                                                        <%= product.status==='return-requested'
+                                                                            ? 'Return Requested' : 'Return Request' %>
+                                                                    </button>
+                                                                    <% } else { %>
+                                                                        <button type="button"
+                                                                            class="btn <%= product.status === 'returned' ? 'btn-danger' : 'btn-secondary' %> return-request"
+                                                                            disabled>
+                                                                            <%= product.status.charAt(0).toUpperCase() +
+                                                                                product.status.slice(1) %>
+                                                                        </button>
+                                                                        <% } %>
+                                                            </td>
+                                                </tr>
+                                                <% }); %>
+                                        </tbody>
+
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address Card -->
+                    <div class="col-12 grid-margin">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Shipping Address</h4>
+                                <% if (order.User.address && order.User.address.length> 0) { %>
+                                    <p><strong>Name:</strong>
+                                        <%= order.User.address[0].name %>
+                                    </p>
+                                    <p><strong>Phone:</strong>
+                                        <%= order.User.address[0].phone %>
+                                    </p>
+                                    <p><strong>Address:</strong>
+                                        <%= order.User.address[0].buildingName %>, <%= order.User.address[0].city %>,
+                                                <%= order.User.address[0].district %>, <%= order.User.address[0].state
+                                                        %> - <%= order.User.address[0].postcode %>
+                                    </p>
+                                    <% } else { %>
+                                        <p>No address available</p>
+                                        <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary Card -->
+                    <div class="col-12 grid-margin">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Order Summary</h4>
+                                <p><strong>Order Date:</strong>
+                                    <%= order.createdAt.toDateString() %>
+                                </p>
+                                <p><strong>Payment Method:</strong>
+                                    <%= order.paymentMethod %>
+                                </p>
+                                <% if (order.coupon) { %>
+                                    <p><strong>Coupon:</strong>
+                                        <%= order.couponName %>
+                                    </p>
+                                    <p><strong>Discount:</strong>
+                                        <%= order.discount %>
+                                    </p>
+                                    <% } %>
+                                        <p><strong>Total Price:</strong>
+                                            <%= order.totalPrice.toFixed(2) %>
+                                        </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.querySelectorAll('.custom-select').forEach(function (selectElement) {
+                            selectElement.addEventListener('change', function () {
+                                const orderId = this.getAttribute('data-order-id');
+                                const productId = this.getAttribute('data-product-id');
+                                const newStatus = this.value;
+
+                                fetch('/admin/order/update-status', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ orderId, productId, status: newStatus })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            console.log('Order status updated successfully');
+                                            if (newStatus === 'delivered') {
+                                                this.setAttribute('disabled', 'disabled');
+                                            }
+                                        } else {
+                                            console.error('Error updating order status:', data.message);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+                            });
+                        });
+
+                        document.querySelectorAll('.return-request').forEach(button => {
+                            button.addEventListener('click', () => {
+                                const orderId = button.getAttribute('data-order-id');
+                                const productId = button.getAttribute('data-product-id');
+
+                                fetch(`/admin/get-return-reason?orderId=${orderId}&productId=${productId}`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            Swal.fire({
+                                                title: 'Return Request',
+                                                html: `<p>Reason: ${data.reason}</p>`,
+                                                showCancelButton: true,
+                                                showDenyButton: true,
+                                                confirmButtonText: 'Approve',
+                                                denyButtonText: 'Reject'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    fetch('/admin/accept-return', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json'
+                                                        },
+                                                        body: JSON.stringify({ orderId, productId })
+                                                    })
+                                                        .then(response => response.json())
+                                                        .then(data => {
+                                                            if (data.success) {
+                                                                Swal.fire('Return approved');
+                                                                button.classList.remove('btn-success', 'btn-danger');
+                                                                button.classList.add('btn-danger');
+                                                                button.textContent = 'Returned';
+                                                                button.disabled = true;
+                                                            } else {
+                                                                Swal.fire('Error', data.message, 'error');
+                                                            }
+                                                        })
+                                                        .catch(error => {
+                                                            Swal.fire('Error', 'Server error', 'error');
+                                                            console.error('Error:', error);
+                                                        });
+                                                } else if (result.isDenied) {
+                                                    Swal.fire({
+                                                        title: 'Reject Return Request',
+                                                        input: 'text',
+                                                        inputLabel: 'Reason for Reject',
+                                                        inputPlaceholder: 'Enter your reason for rejecting the product',
+                                                        showCancelButton: true,
+                                                        confirmButtonText: 'Submit',
+                                                        cancelButtonText: 'Cancel',
+                                                        preConfirm: (reason) => {
+                                                            if (!reason) {
+                                                                Swal.showValidationMessage('Please enter a reason for rejection');
+                                                            }
+                                                            return reason;
+                                                        }
+                                                    }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            fetch('/admin/reject-return', {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json'
+                                                                },
+                                                                body: JSON.stringify({ orderId, productId, reason: result.value })
+                                                            })
+                                                                .then(response => response.json())
+                                                                .then(data => {
+                                                                    if (data.success) {
+                                                                        Swal.fire('Return rejected');
+                                                                        button.classList.remove('btn-success', 'btn-danger');
+                                                                        button.classList.add('btn-secondary');
+                                                                        button.textContent = 'Rejected';
+                                                                        button.disabled = true;
+                                                                    } else {
+                                                                        Swal.fire('Error', data.message, 'error');
+                                                                    }
+                                                                })
+                                                                .catch(error => {
+                                                                    Swal.fire('Error', 'Server error', 'error');
+                                                                    console.error('Error:', error);
+                                                                });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        } else {
+                                            Swal.fire('Error', data.message, 'error');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        Swal.fire('Error', 'Server error', 'error');
+                                        console.error('Error:', error);
+                                    });
+                            });
+                        });
+                    });
+
+                </script>
+
+
+
+            </div>
+
+
+
+
+
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+            <script src="/admin/assets/vendors/js/vendor.bundle.base.js"></script>
+            <!-- endinject -->
+            <!-- Plugin js for this page -->
+            <!-- End plugin js for this page -->
+            <!-- inject:js -->
+            <script src="/admin/assets/js/off-canvas.js"></script>
+            <script src="/admin/assets/js/hoverable-collapse.js"></script>
+            <script src="/admin/assets/js/misc.js"></script>
+            <script src="/admin/assets/js/settings.js"></script>
+            <script src="/admin/assets/js/todolist.js"></script>
+            <!-- endinject -->
+            <!-- Custom js for this page -->
+            <!-- End custom js for this page -->
+</body>
+
+</html>

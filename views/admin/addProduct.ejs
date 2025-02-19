@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Corona Admin</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <!-- endinject -->
+  <!-- Layout styles -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <!-- End layout styles -->
+  <link rel="shortcut icon" href="assets/images/favicon.png" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script defer src="https://cdn.crop.guide/loader/l.js?c=QMDKLG"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
+    integrity="sha512-FXIWtxx7V2G9M5E0yNME6GzPMDQbS6VZupE4mIsVpSGPHlDJxuvzOh6IOAX13BrInFvI6X26/ZVci3uQ/WMp9g=="
+    crossorigin="anonymous" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"
+    integrity="sha512-tOAx9sHd6E6AS8jPV3eH+8G5vlnVpBOz8oXxZAZdTxUg2aZ1GNGUsA88B+H+wVDHdF3DfbxZHPzhyKFSN4PTw=="
+    crossorigin="anonymous"></script>
+  <style>
+    .img-thumbnail {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 5px;
+      width: 150px;
+      height: 150px;
+    }
+
+    .mr-2 {
+      margin-right: 0.5rem;
+    }
+
+    .mt-2 {
+      margin-top: 0.5rem;
+    }
+  </style>
+
+
+
+</head>
+
+<body>
+  <div class="container-scroller">
+    <!-- partial:../../partials/_sidebar.html -->
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+        <a class="sidebar-brand brand-logo" href="index.html"><img src="assets/images/logo.svg" alt="logo" /></a>
+        <a class="sidebar-brand brand-logo-mini" href="index.html"><img src="assets/images/logo-mini.svg"
+            alt="logo" /></a>
+      </div>
+      <ul class="nav">
+        <li class="nav-item profile">
+          <div class="profile-desc">
+            <div class="profile-pic">
+              <div class="count-indicator">
+                <img class="img-xs rounded-circle " src="assets/images/faces/face15.jpg" alt="">
+                <span class="count bg-success"></span>
+              </div>
+              <div class="profile-name">
+                <h5 class="mb-0 font-weight-normal">Shivaprasad</h5>
+                <span>Gold Member</span>
+              </div>
+            </div>
+            <a href="#" id="profile-dropdown" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></a>
+            <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list"
+              aria-labelledby="profile-dropdown">
+              <a href="#" class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-dark rounded-circle">
+                    <i class="mdi mdi-settings text-primary"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject ellipsis mb-1 text-small">Account settings</p>
+                </div>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="#" class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-dark rounded-circle">
+                    <i class="mdi mdi-onepassword  text-info"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
+                </div>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="#" class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-dark rounded-circle">
+                    <i class="mdi mdi-calendar-today text-success"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <p class="preview-subject ellipsis mb-1 text-small">To-do list</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item nav-category">
+          <span class="nav-link">Navigation</span>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/dashboard">
+            <span class="menu-icon">
+              <i class="mdi mdi-speedometer"></i>
+            </span>
+            <span class="menu-title">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/User">
+            <span class="menu-icon">
+              <i class="mdi mdi-laptop"></i>
+            </span>
+            <span class="menu-title">User</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/allCategory">
+            <span class="menu-icon">
+              <i class="mdi mdi-chart-bar"></i>
+            </span>
+            <span class="menu-title">Category</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/category">
+            <span class="menu-icon">
+              <i class="mdi mdi-table-large"></i>
+            </span>
+            <span class="menu-title">Add Category</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/allProduct">
+            <span class="menu-icon">
+              <i class="mdi mdi-security"></i>
+            </span>
+            <span class="menu-title">All products</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/addProduct">
+            <span class="menu-icon">
+              <i class="mdi mdi-security"></i>
+            </span>
+            <span class="menu-title">Add products</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/order">
+            <span class="menu-icon">
+              <i class="mdi mdi-security"></i>
+            </span>
+            <span class="menu-title">Orders</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/coupon">
+            <span class="menu-icon">
+              <i class="mdi mdi-security"></i>
+            </span>
+            <span class="menu-title">Coupons</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/offer">
+            <span class="menu-icon">
+              <i class="mdi mdi-security"></i>
+            </span>
+            <span class="menu-title">Offer</span>
+          </a>
+        </li>
+        <li class="nav-item menu-items">
+          <a class="nav-link" href="/admin/salesReport">
+            <span class="menu-icon">
+              <i class="mdi mdi-security"></i>
+            </span>
+            <span class="menu-title">Sales Report</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+
+    <div class="container mt-5">
+      <h2>Add Product</h2>
+      <form id="addProductForm" action="/admin/AddProductPost" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="productName">Product Name:</label>
+          <input type="text" class="form-control form-control-sm" id="productName" name="productName" required>
+          <div class="invalid-feedback">Please provide a product name.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="brand">Brand:</label>
+          <input type="text" class="form-control form-control-sm" id="brand" name="brand" required>
+          <div class="invalid-feedback">Please provide a brand name.</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="productPrice">Price:</label>
+            <input type="number" class="form-control form-control-sm" id="productPrice" name="productPrice" min="0"
+              required>
+            <div class="invalid-feedback">Please provide a valid price.</div>
+          </div>
+
+          <div class="form-group col-md-4">
+            <label for="quantity">Quantity:</label>
+            <input type="number" class="form-control form-control-sm" id="quantity" name="quantity" min="0" required>
+            <div class="invalid-feedback">Please provide a valid quantity.</div>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label for="mainCategory">Category:</label>
+          <select class="form-control" id="mainCategory" name="mainCategory" required>
+            <option value="">Select a category</option>
+            <% categories.forEach(category=> { %>
+              <option value="<%= category.categoryName %>">
+                <%= category.categoryName %>
+              </option>
+              <% }); %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="subCategory">Subcategory:</label>
+          <select class="form-control sub-category-select" id="subCategory" name="subCategory" required>
+            <option value=""></option>
+          </select>
+          <div class="invalid-feedback">Please select a subcategory.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="productDescription">Product Description:</label>
+          <textarea class="form-control" id="productDescription" name="productDescription" rows="6" required></textarea>
+          <div class="invalid-feedback">Please provide a product description.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="productImages">Product Images:</label>
+          <input type="file" class="form-control-file" id="productImages" name="product_image" accept="image/*" required
+            multiple>
+          <div class="invalid-feedback">Please upload at least one image.</div>
+          <div id="imagePreview" class="mt-3"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Product</button>
+      </form>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+      // Image preview
+      document.getElementById('productImages').addEventListener('change', function (event) {
+        const imagePreview = document.getElementById('imagePreview');
+        imagePreview.innerHTML = '';
+
+        const files = event.target.files;
+        for (const file of files) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.classList.add('img-thumbnail', 'mr-2', 'mt-2');
+            img.style.width = '150px';
+            img.style.height = '150px';
+            imagePreview.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Fetch subcategories
+      const selectElement = document.getElementById('mainCategory');
+      selectElement.addEventListener('change', function (event) {
+        const selectedOption = event.target.value;
+        axios.post('/admin/fetch-subcategory', { selectedOption })
+          .then(response => {
+            const subCategorySelect = document.getElementById('subCategory');
+            subCategorySelect.innerHTML = ''; // Clear existing options
+            response.data.category.forEach(element => {
+              const subcategory = element.subCategory;
+              if (typeof subcategory === 'string') {
+                const option = document.createElement('option');
+                option.value = subcategory;
+                option.textContent = subcategory;
+                subCategorySelect.appendChild(option);
+              }
+            });
+          })
+          .catch(error => {
+            console.error('Error:', error);
+
+          });
+      });
+
+      // Form validation and submission
+      document.getElementById('addProductForm').addEventListener('submit', function (event) {
+        // Check for whitespace only inputs
+        const inputs = this.querySelectorAll('input, select, textarea');
+        let hasWhitespace = false;
+        inputs.forEach(function (input) {
+          if (input.value.trim() === '') {
+            input.classList.add('is-invalid');
+            hasWhitespace = true;
+          } else {
+            input.classList.remove('is-invalid');
+          }
+        });
+
+        if (hasWhitespace) {
+          event.preventDefault();
+          return;
+        }
+
+        // Check for negative price or quantity
+        const price = parseFloat(document.getElementById('productPrice').value);
+        const quantity = parseInt(document.getElementById('quantity').value);
+        if (price < 0 || quantity < 0) {
+          document.getElementById('productPrice').classList.add('is-invalid');
+          document.getElementById('quantity').classList.add('is-invalid');
+          event.preventDefault();
+          return;
+        }
+
+        // Handle form submission
+        event.preventDefault();
+        const formData = new FormData(this);
+
+        axios.post('/admin/AddProductPost', formData)
+          .then(response => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Product added successfully!',
+              showConfirmButton: true,
+            }).then(() => {
+
+              window.location.href = '/admin/allProduct';
+            });
+
+            this.reset();
+            document.getElementById('imagePreview').innerHTML = '';
+          })
+          .catch(error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'There was an error adding the product.',
+            });
+          });
+      });
+    </script>
+
+    <!-- -------------------add product form validation end------------------- -->
+
+
+    <script src="assets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="assets/js/off-canvas.js"></script>
+    <script src="assets/js/hoverable-collapse.js"></script>
+    <script src="assets/js/misc.js"></script>
+    <script src="assets/js/settings.js"></script>
+    <script src="assets/js/todolist.js"></script>
+    <!-- endinject -->
+    <!-- Custom js for this page -->
+    <!-- End custom js for this page -->
+</body>
+
+</html>

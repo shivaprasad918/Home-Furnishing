@@ -1,0 +1,453 @@
+<%- include('../layouts/header.ejs') -%>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="header-top">
+                <div class="container">
+                    <div class="header-left">
+
+                    </div><!-- End .header-left -->
+
+                    <div class="header-right">
+                    </div><!-- End .header-right -->
+                </div><!-- End .container -->
+            </div><!-- End .header-top -->
+
+            <div class="header-middle sticky-header">
+                <div class="container">
+                    <div class="header-left">
+
+
+                        <nav class="main-nav">
+                            <ul class="menu sf-arrows">
+                                <li class="megamenu-container active">
+                                    <a href="/" class="sf-with-ul">Home</a>
+
+                                </li>
+                                <li>
+                                    <a href="/allproducts" class="sf-with-ul">Shop</a>
+                                </li>
+                                <li>
+                                    <a href="/wishlist" class="sf-with-ul">Wishlist</a>
+
+                                </li>
+                                <li>
+                                    <a href="/profile" class="sf-with-ul">Profile</a>
+                                </li>
+                            </ul><!-- End .menu -->
+                        </nav><!-- End .main-nav -->
+                    </div><!-- End .header-left -->
+
+                    <div class="header-right">
+
+
+                        <div class="header-search">
+                            <a href="#" class="search-toggle" role="button" title="Search"><i class="icon-search"></i></a>
+                            <form action="/allproducts" method="get" onsubmit="performSearch(event)">
+                                <div class="header-search-wrapper">
+                                    <input type="hidden" name="category" value="<%= selectedCategory %>">
+                                    <input type="hidden" name="sort" value="<%= sortOption %>">
+                                    <label for="q" class="sr-only">Search</label>
+                                    <input type="search" class="form-control" name="q" id="q" placeholder="Search in..." value="<%= searchTerm %>" required>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        
+                    
+                        <div class="dropdown cart-dropdown">
+
+                            <a href="/cart" class="dropdown-toggle" aria-haspopup="true" aria-expanded="false"
+                                data-display="static">
+                                <i class="icon-shopping-cart"></i>
+                            </a>
+
+                        </div><!-- End .cart-dropdown -->
+
+
+
+
+                        <style>
+                            .dropdown {
+                                margin-top: 40%;
+                            }
+                        </style>
+
+                    </div><!-- End .header-right -->
+                </div><!-- End .container -->
+            </div><!-- End .header-middle -->
+        </header><!-- End .header -->
+
+
+
+        <main class="main">
+            <div class="page-header text-center" style="background-image: url('/user/assets/images/page-header-bg.jpg')">
+                <div class="container">
+                    <h1 class="page-title">AllProducts<span>Shop</span></h1>
+                </div>
+            </div>
+        
+            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+                <div class="container d-flex align-items-center">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Shop</li>
+                    </ol>
+                    <nav class="product-pager ml-auto" aria-label="Product">
+                        <select name="sortby" id="sortby" class="form-control" onchange="updateSort(this)">
+                            <option value="default" <%= sortOption === 'default' ? 'selected' : '' %>>Sort By</option>
+                            <option value="priceLowToHigh" <%= sortOption === 'priceLowToHigh' ? 'selected' : '' %>>Low-High</option>
+                            <option value="priceHighToLow" <%= sortOption === 'priceHighToLow' ? 'selected' : '' %>>High-Low</option>
+                            <option value="name" <%= sortOption === 'name' ? 'selected' : '' %>>Name</option>
+                            <option value="latest" <%= sortOption === 'latest' ? 'selected' : '' %>>Latest Products</option>
+                        </select>
+        
+                        <select name="category" id="filter" class="form-control" onchange="updateCategory(this)">
+                            <option value="all" <%= selectedCategory === 'all' ? 'selected' : '' %>>All Categories</option>
+                            <% categories.forEach(category => { %>
+                                <option value="<%= category %>" <%= selectedCategory === category ? 'selected' : '' %>>
+                                    <%= category %>
+                                </option>
+                            <% }); %>
+                        </select>
+                                                
+                    </nav>
+                </div>
+            </nav>
+        
+            <input type="hidden" value='<%= JSON.stringify(products) %>' id="dataHere">
+            <script>
+                function updateSort(select) {
+                    const selectedSortOption = select.value;
+                    const searchTerm = document.getElementById('q').value;
+                    const category = document.getElementById('filter').value;
+                    window.location.href = `/allProducts?sort=${encodeURIComponent(selectedSortOption)}&category=${encodeURIComponent(category)}&q=${encodeURIComponent(searchTerm)}&page=1`;
+                }
+        
+                function updateCategory(select) {
+                 const selectedCategory = select.value;
+                 const searchTerm = document.getElementById('q').value;
+                 const sortOption = document.getElementById('sortby').value;
+                 window.location.href = `/allProducts?category=${encodeURIComponent(selectedCategory)}&sort=${encodeURIComponent(sortOption)}&q=${encodeURIComponent(searchTerm)}&page=1`;
+                }
+
+
+        
+                function performSearch(event) {
+                    event.preventDefault();
+                    const searchTerm = document.getElementById('q').value;
+                    const sortOption = document.getElementById('sortby').value;
+                    const category = document.getElementById('filter').value;
+                    window.location.href = `/allProducts?q=${encodeURIComponent(searchTerm)}&sort=${encodeURIComponent(sortOption)}&category=${encodeURIComponent(category)}&page=1`;
+                }
+            </script>
+        
+            <div class="page-content">
+                <div class="container">
+                    <div class="products">
+                        <div class="row" id="productsContainer">
+                            <% if (noProducts) { %>
+                                <div class="col-12">
+                                    <p class="text-center">No products found.</p>
+                                </div>
+                            <% } else { %>
+                                <% products.forEach(product => { %>
+                                    <div class="col-6 col-md-4 col-lg-4 col-xl-3">
+                                        <div class="product">
+                                            <figure class="product-media">
+                                                <% if (product.new) { %>
+                                                    <span class="product-label label-new">New</span>
+                                                <% } %>
+                                                <a href="/singleProduct?productId=<%= product._id %>">
+                                                    <img src="<%= product.product_image[0].resizedFile %>" alt="Product image" class="product-image">
+                                                </a>
+                                                <div class="product-action-vertical">
+                                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable" onclick="addToWishlist('<%= product._id %>')"><span>add to wishlist</span></a>
+                                                </div>
+                                                <div class="product-action action-icon-top">
+                                                    <a href="#" onclick="addtoCart('<%= product._id %>', event)" class="btn-product btn-cart"><span>add to cart</span></a>
+                                                </div>
+                                            </figure>
+                                            <div class="product-body">
+                                                <div class="product-cat">
+                                                    <a href="#"><%= product.category.name %></a>
+                                                </div>
+                                                <h3 class="product-title"><a href="product.html"><%= product.productName %></a></h3>
+                                                <h3 class="product-title"><%= product.brand %></a></h3>
+                                                <div class="product-price">
+                                                    <% if (product.discounted) { %>
+                                                        ₹<%= product.effectivePrice %>
+                                                        <s class="text-light" style="font-size: 12px;">₹<%= product.originalPrice %></s>
+                                                    <% } else { %>
+                                                        ₹<%= product.effectivePrice %>
+                                                    <% } %>                                                  
+                                                </div>
+                                                <div><%= product.quantity %></div>
+                                                <div class="ratings-container">
+                                                    <div class="ratings">
+                                                        <div class="ratings-val" style="width: 80%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div class="d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <% if (totalPages > 1) { %>
+                        <% if (currentPage > 1) { %>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<%= currentPage - 1 %><%= queryParams %>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        <% } %>
+        
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %><%= queryParams %>"><%= i %></a>
+                            </li>
+                        <% } %>
+        
+                        <% if (currentPage < totalPages) { %>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<%= currentPage + 1 %><%= queryParams %>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        <% } %>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+        
+        
+        
+
+
+
+
+        <footer class="footer">
+
+            
+            <div class="footer-middle">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget widget-about">
+                                <img src="/user/assets/images/logo.png" class="footer-logo" alt="Footer Logo"
+                                    width="105" height="25">
+                                <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate
+                                    magna eros eu erat. </p>
+
+                                <div class="social-icons">
+                                    <a href="#" class="social-icon" target="_blank" title="Facebook"><i
+                                            class="icon-facebook-f"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Twitter"><i
+                                            class="icon-twitter"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Instagram"><i
+                                            class="icon-instagram"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Youtube"><i
+                                            class="icon-youtube"></i></a>
+                                    <a href="#" class="social-icon" target="_blank" title="Pinterest"><i
+                                            class="icon-pinterest"></i></a>
+                                </div><!-- End .soial-icons -->
+                            </div><!-- End .widget about-widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="about.html">About Molla</a></li>
+                                    <li><a href="#">How to shop on Molla</a></li>
+                                    <li><a href="#">FAQ</a></li>
+                                    <li><a href="contact.html">Contact us</a></li>
+                                    <li><a href="login.html">Log in</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="#">Payment Methods</a></li>
+                                    <li><a href="#">Money-back guarantee!</a></li>
+                                    <li><a href="#">Returns</a></li>
+                                    <li><a href="#">Shipping</a></li>
+                                    <li><a href="#">Terms and conditions</a></li>
+                                    <li><a href="#">Privacy Policy</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="widget">
+                                <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
+
+                                <ul class="widget-list">
+                                    <li><a href="#">Sign In</a></li>
+                                    <li><a href="cart.html">View Cart</a></li>
+                                    <li><a href="#">My Wishlist</a></li>
+                                    <li><a href="#">Track My Order</a></li>
+                                    <li><a href="#">Help</a></li>
+                                </ul><!-- End .widget-list -->
+                            </div><!-- End .widget -->
+                        </div><!-- End .col-sm-6 col-lg-3 -->
+                    </div><!-- End .row -->
+                </div><!-- End .container -->
+            </div><!-- End .footer-middle -->
+
+            <div class="footer-bottom">
+                <div class="container">
+                    <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
+                    <!-- End .footer-copyright -->
+                    <figure class="footer-payments">
+                        <img src="/user/assets/images/payments.png" alt="Payment methods" width="272" height="20">
+                    </figure><!-- End .footer-payments -->
+                </div><!-- End .container -->
+            </div><!-- End .footer-bottom -->
+        </footer><!-- End .footer -->
+    </div><!-- End .page-wrapper -->
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+
+    <div class="mobile-menu-container">
+        <div class="mobile-menu-wrapper">
+            <span class="mobile-menu-close"><i class="icon-close"></i></span>
+
+            <form action="#" method="get" class="mobile-search">
+                <label for="mobile-search" class="sr-only">Search</label>
+                <input type="search" class="form-control" name="mobile-search" id="mobile-search"
+                    placeholder="Search in..." required>
+                <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
+            </form>
+
+
+            <div class="social-icons">
+                <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
+                <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+            </div><!-- End .social-icons -->
+        </div><!-- End .mobile-menu-wrapper -->
+    </div><!-- End .mobile-menu-container -->
+
+    <!-- Sign in / Register Modal -->
+    <div class="modal fade" id="signin-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="icon-close"></i></span>
+                    </button>
+
+                </div><!-- End .modal-body -->
+            </div><!-- End .modal-content -->
+        </div><!-- End .modal-dialog -->
+    </div><!-- End .modal -->
+
+    <!-- Plugins JS File -->
+    <script src="/user/assets/js/jquery.min.js"></script>
+    <script src="/user/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/user/assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="/user/assets/js/jquery.waypoints.min.js"></script>
+    <script src="/user/assets/js/superfish.min.js"></script>
+    <script src="/user/assets/js/owl.carousel.min.js"></script>
+    <script src="/user/assets/js/wNumb.js"></script>
+    <script src="/user/assets/js/bootstrap-input-spinner.js"></script>
+    <script src="/user/assets/js/jquery.magnific-popup.min.js"></script>
+    <script src="/user/assets/js/nouislider.min.js"></script>
+    <!-- Main JS File -->
+    <script src="/user/assets/js/main.js"></script>
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+        function addtoCart(productId, event) {
+            event.preventDefault();
+            const data = { productId: productId };
+            axios.post('/addtoCart', data)
+                .then(response => {
+                    console.log(response);
+                    swal("Success", "Product added to cart!", "success");
+                })
+                .catch(error => {
+                    console.error(error);
+
+                    if (error.response) {
+                        if (error.response.status === 400 && error.response.data.message === 'Product out of stock') {
+                            swal("Error", "Product out of stock", "error");
+                        } else if (error.response.status === 404 && error.response.data.message === 'Product not found') {
+                            swal("Error", "Product not found", "error");
+                        } else if (error.response.status === 401 && error.response.data.message === 'User not authenticated') {
+                            swal("Error", "User not authenticated", "error");
+                        } else {
+                            swal("Error", "Something went wrong!", "error");
+                        }
+                    } else {
+                        swal("Error", "Something went wrong!", "error");
+                    }
+                });
+        }
+
+
+
+
+        //addto wishlist
+
+
+        function addToWishlist(productId) {
+            const data = {
+                productId: productId
+            }
+            axios.post('/addToWishlist', data)
+                .then(response => {
+                    console.log(response);
+                    swal({
+                        title: "Success!",
+                        text: "Product added to wishlist",
+                        icon: "success",
+                        button: "OK",
+                    }).then(() => {
+
+                        window.location.reload(); // Reloads the page
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                    // Handle error case
+                    swal({
+                        title: "Error!",
+                        text: "Failed to add product to wishlist",
+                        icon: "error",
+                        button: "OK",
+                    });
+                });
+
+        }
+
+
+
+
+    </script>
+
+
+    </body>
+
+
+    <!-- molla/category-boxed.html  22 Nov 2019 10:03:02 GMT -->
+
+    </html>

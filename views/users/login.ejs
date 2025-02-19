@@ -1,0 +1,89 @@
+<%- include('../layouts/header.ejs') -%>
+
+<main class="main">
+
+    <div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17"
+        style="background-image: url('user/assets/images/backgrounds/login-bg.jpg')">
+        <div class="container">
+            <div class="form-box">
+                <div class="form-tab">
+                    <ul class="nav nav-pills nav-fill" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="register-tab-2" data-toggle="tab" href="#register-2"
+                                role="tab" aria-controls="register-2" aria-selected="true">Login</a>
+                        </li>
+                    </ul>
+                    <br>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="signin-2" role="tabpanel"
+                            aria-labelledby="signin-tab-2">
+                            <form action="/login" method="POST" id="login-form" onsubmit="return validateLoginForm()">
+                                <div class="form-group">
+                                    <label for="singin-email-2">Email Address *</label>
+                                    <input type="text" class="form-control" id="email" name="email" >
+                                </div><!-- End .form-group -->
+                                <br>
+                                <div class="form-group">
+                                    <label for="singin-password-2">Password *</label>
+                                    <input type="password" class="form-control" id="password" name="password"
+                                        >
+                                </div>
+                                <% if (locals.message) { %>
+                                    <div class="alert alert-danger" role="alert">
+                                        <%= locals.message %>
+                                    </div>
+                                <% } %>
+                                
+                          <!-- End .form-group -->
+                                <br>
+                                <div class="form-footer">
+                                    <button type="submit" class="btn btn-outline-primary-2">
+                                        <span>LOG IN</span>
+                                        <i class="icon-long-arrow-right"></i>
+                                    </button>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="signin-remember-2">
+                                        <label class="custom-control-label" for="signin-remember-2">Remember
+                                            Me</label>
+                                    </div><!-- End .custom-checkbox -->
+
+                                    <a href="/resetPassMail" class="forgot-link">Forgot Your Password?</a>
+                                </div><!-- End .form-footer -->
+                                <a href="register">dont have an account ?</a>
+                            </form>
+
+                        </div><!-- .End .tab-pane -->
+
+                    </div><!-- End .tab-content -->
+                </div><!-- End .form-tab -->
+            </div><!-- End .form-box -->
+        </div><!-- End .container -->
+    </div><!-- End .login-page section-bg -->
+</main><!-- End .main -->
+<script>
+   function validateLoginForm() {
+    var email = document.getElementById("email").value.trim();
+    var password = document.getElementById("password").value.trim();
+
+    // Regular expression for email validation
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (email === "" || password === "") {
+        alert("Email and password are required");
+        return false; // Prevent form submission
+    }
+
+    if (!emailRegex.test(email)) {
+        alert("Please enter a valid email address");
+        return false; // Prevent form submission
+    }
+
+    // Additional validation logic for password can be added here if needed
+
+    return true; // Allow form submission
+}
+</script>
+
+<%- include('../layouts/footer.ejs') -%>

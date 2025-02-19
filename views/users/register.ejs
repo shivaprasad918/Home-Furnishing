@@ -1,0 +1,155 @@
+<%- include('../layouts/header.ejs') -%>
+
+<div class="page-wrapper">
+    <main class="main">
+        <div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17"
+            style="background-image: url('user/assets/images/backgrounds/login-bg.jpg')">
+            <div class="container">
+                <div class="form-box">
+                    <div class="form-tab">
+                        <ul class="nav nav-pills nav-fill" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="register-tab-2" data-toggle="tab" href="#register-2"
+                                    role="tab" aria-controls="register-2" aria-selected="true">Register</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="register-2" role="tabpanel"
+                                aria-labelledby="register-tab-2">
+                                <form method="post" action="/register" onsubmit="return show()">
+                                    <div class="form-group">
+                                        <div class="flash-message" id="flash-message"></div>
+                                        <label for="register-name-2">Full Name *</label>
+                                        <input type="text" class="form-control" id="register-name-2" name="name">
+                                        <div class="error-message" id="name-error"></div>
+                                    </div><!-- End .form-group -->
+
+                                    <div class="form-group">
+                                        <label for="register-email-2">Your email address *</label>
+                                        <input type="email" class="form-control" id="register-email-2" name="email">
+                                    </div><!-- End .form-group -->
+
+                                    <div class="form-group">
+                                        <label for="register-mobile">Your Mobile Number *</label>
+                                        <input type="text" class="form-control" id="register-mobile" name="mobile">
+                                    </div><!-- End .form-group -->
+
+                                    <div class="form-group">
+                                        <label for="register-password-2">Password *</label>
+                                        <input type="password" class="form-control" id="register-password-2"
+                                            name="password">
+                                    </div> <!-- End .form-group -->
+
+                                    <div class="form-group">
+                                        <label for="register-referral">Referral Code</label>
+                                        <input type="text" class="form-control" id="register-referral" name="referredBy">
+                                    </div>
+
+                                    <div class="form-footer">
+                                        <button type="submit" class="btn btn-outline-primary-2">
+                                            <span>SIGN UP</span>
+                                            <i class="icon-long-arrow-right"></i>
+                                        </button>
+
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="register-policy-2">
+                                            <label class="custom-control-label" for="register-policy-2">I
+                                                agree to the <a href="#">privacy policy</a> *</label>
+                                        </div><!-- End .custom-checkbox -->
+                                    </div><!-- End .form-footer -->
+                                    <a href="login">already have an account ?</a>
+                                    <br><br>
+                                    <div class="form-choice">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <a href="/auth/google" class="btn btn-login btn-g">
+                                                    <i class="icon-google"></i>
+                                                    Login With Google
+                                                </a>
+                                            </div><!-- End .col-6 -->
+                                        </div><!-- End .row -->
+                                    </div><!-- End .form-choice -->
+                                </form>
+                            </div><!-- .End .tab-pane -->
+                        </div><!-- End .tab-content -->
+                    </div><!-- End .form-tab -->
+                </div><!-- End .form-box -->
+            </div><!-- End .container -->
+        </div><!-- End .login-page section-bg -->
+    </main><!-- End .main -->
+
+    <style>
+        .error {
+            border: 1px solid red;
+        }
+        .flash-message {
+            display: none;
+            color: red;
+            margin: 10px 0;
+        }
+    </style>
+</div><!-- End .page-wrapper -->
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+<script>
+    function show() {
+        console.log("hhh");
+        var name = document.getElementById("register-name-2").value.trim();
+        var phone = document.getElementById("register-mobile").value.trim();
+        var email = document.getElementById("register-email-2").value.trim();
+        var password = document.getElementById("register-password-2").value.trim();
+
+        var flashMessage = document.getElementById("flash-message");
+        var errorMessage = "";
+
+        // Clear previous error styles
+        document.getElementById("register-name-2").classList.remove("error");
+        document.getElementById("register-mobile").classList.remove("error");
+        document.getElementById("register-email-2").classList.remove("error");
+        document.getElementById("register-password-2").classList.remove("error");
+
+        // Validate form inputs
+        if (name === "" || phone === "" || email === "" || password === '') {
+            errorMessage = "Name, phone, email, and password are required";
+            if (name === "") document.getElementById("register-name-2").classList.add("error");
+            if (phone === "") document.getElementById("register-mobile").classList.add("error");
+            if (email === "") document.getElementById("register-email-2").classList.add("error");
+            if (password === "") document.getElementById("register-password-2").classList.add("error");
+        }
+
+        // Validate phone number
+        if (errorMessage === "" && (phone.length !== 10 || isNaN(phone))) {
+            errorMessage = "Please enter a valid 10-digit phone number";
+            document.getElementById("register-mobile").classList.add("error");
+        }
+
+        // Validate email address
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (errorMessage === "" && !emailRegex.test(email)) {
+            errorMessage = "Please enter a valid email address";
+            document.getElementById("register-email-2").classList.add("error");
+        }
+
+        if (errorMessage !== "") {
+            flashMessage.textContent = errorMessage;
+            flashMessage.style.display = "block";
+            return false;
+        } else {
+            flashMessage.style.display = "none";
+        }
+
+        return true;
+    }
+
+    // Function to display session message if it exists
+    window.onload = function() {
+        var flashMessage = document.getElementById("flash-message");
+        var sessionMessage = "<%= registrationMessage %>";
+        if (sessionMessage) {
+            flashMessage.textContent = sessionMessage;
+            flashMessage.style.display = "block";
+        }
+    }
+</script>
+
+<%- include('../layouts/footer.ejs') -%>

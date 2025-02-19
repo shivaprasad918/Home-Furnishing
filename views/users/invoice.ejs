@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Furishing</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: auto; }
+        .header, .footer { text-align: center; margin-bottom: 20px; }
+        .content { margin-bottom: 40px; }
+        .content h2 { margin-bottom: 10px; }
+        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .table th, .table td { border: 1px solid #000; padding: 10px; text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Invoice</h1>
+        </div>
+        <div class="content">
+            <h2>Order Information</h2>
+            <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+            <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
+            <p><strong>Payment Status:</strong> <%= order.paymentStatus %></p>
+
+            <h2>Shipping Address</h2>
+            <% let defaultAddress = order.User.address.find(address => address.default); %>
+            <% if (!defaultAddress && order.User.address.length > 0) { %>
+                <% defaultAddress = order.User.address[0]; %>
+            <% } %>
+            <% if (defaultAddress) { %>
+                <p><strong>Name:</strong> <%= order.User.name %></p>
+                <p><strong>Phone:</strong> <%= order.User.mobile %></p>
+                <p><strong>Address:</strong> <%= defaultAddress.buildingName %>, <%= defaultAddress.city %>, <%= defaultAddress.state %>, <%= defaultAddress.postcode %></p>
+            <% } else { %>
+                <p>No shipping address available</p>
+            <% } %>
+
+            <h2>Products</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Original Price</th>
+                        <% if(order.couponName.length > 0) { %>
+                            <th>Coupon Discounted Price</th>
+                        <% } %>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% order.products.forEach(product => { %>
+                    <tr>
+                        <% if (product.image) { %>
+                            <td><img src="<%= product.image %>" alt="Product Image" style="width: 50px; height: auto;"></td>
+                        <% } else { %>
+                            <td>No Image</td>
+                        <% } %>
+                        <td><%= product.name %></td>
+                        <td><%= product.quantity %></td>
+                        <td><%= (product.price * product.quantity).toFixed(2) %></td>
+                        <% if(order.couponName.length > 0) { %>
+                            <td><%= product.total %></td>
+                        <% } %>
+                        <td><%= product.status %></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4"><strong>Grand Total:</strong></td>
+                        <td><%= order.totalPrice.toFixed(2) %></td>
+                        <% if(order.couponName.length > 0) { %>
+                            <td colspan="2"><strong>Coupon Used:</strong> <%= order.couponName %></td>
+                        <% } %>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="footer">
+            <p>Thank you for your purchase!</p>
+        </div>
+    </div>
+</body>
+</html>

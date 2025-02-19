@@ -1,0 +1,146 @@
+<%- include('../layouts/header.ejs') -%>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="header-middle sticky-header">
+                <div class="container">
+                    <div class="header-left">
+                        <button class="mobile-menu-toggler">
+                            <span class="sr-only">Toggle mobile menu</span>
+                            <i class="icon-bars"></i>
+                        </button>
+                        <a href="index.html" class="logo">
+                            <img src="/user/assets/images/demos/demo-2/logo.png" alt="Molla Logo" width="105" height="25">
+
+                        </a>
+                        <nav class="main-nav">
+                            <ul class="menu sf-arrows">
+                                <li class="megamenu-container active">
+                                    <a href="/" class="sf-with-ul">Home</a>                          
+                                </li>
+                                <li>
+                                    <a href="/allproducts" class="sf-with-ul">Shop</a>                                
+                                </li>
+                                <!-- <li>
+                                    <a href="product.html" class="sf-with-ul">Product</a>       
+                                </li>
+                                <li>
+                                    <a href="#" class="sf-with-ul">Pages</a>                                   
+                                </li> -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="container" style="max-width: 800px; padding: 30px;">
+                <form id="address-form" action="/updateAddress" method="post">
+                    <input type="hidden" name="addressId" value="<%= address._id %>">
+                    <div class="form-section">
+                        <h2 class="checkout-title">Edit Address</h2>
+                        <div class="form-group">
+                            <label for="first-name">Name *</label>
+                            <input type="text" class="form-control" id="first-name" name="name" value="<%=address.name%>" required>
+                            <small class="error-message"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="<%=address.phone%>" required>
+                            <small class="error-message"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="company-name">Building Name/House Name *</label>
+                            <input type="text" class="form-control" id="company-name" name="buildingName" value="<%=address.buildingName%>" required>
+                            <small class="error-message"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" class="form-control" id="city" name="city" value="<%=address.city%>" required>
+                            <small class="error-message"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="district">District *</label>
+                            <input type="text" class="form-control" id="district" name="district" value="<%=address.district%>" required>
+                            <small class="error-message"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State *</label>
+                            <input type="text" class="form-control" id="state" name="state" value="<%=address.state%>" required>
+                            <small class="error-message"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="postcode">Pincode *</label>
+                            <input type="text" class="form-control" id="postcode" name="postcode" value="<%=address.postcode%>" required>
+                            <small class="error-message"></small>
+                        </div>
+                    </div>
+                    <div class="button-group" style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary" >Update Address</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-middle">
+                <div class="container">
+                    <div class="row">
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('address-form');
+            
+            form.addEventListener('submit', function (event) {
+                let isValid = true;
+    
+                document.querySelectorAll('.form-control').forEach(input => {
+                    const errorMessage = input.nextElementSibling;
+                    errorMessage.textContent = "";
+                    input.style.border = "1px solid #ccc";
+    
+                    if (!input.value.trim()) {
+                        errorMessage.textContent = "This field is required.";
+                        input.style.border = "2px solid red";
+                        isValid = false;
+                    }
+    
+                    if (input.id === "phone" && input.value.trim() && !/^\d{10}$/.test(input.value)) {
+                        errorMessage.textContent = "Phone number must be 10 digits.";
+                        input.style.border = "2px solid red";
+                        isValid = false;
+                    }
+    
+                    if (input.id === "postcode" && input.value.trim() && !/^\d{6}$/.test(input.value)) {
+                        errorMessage.textContent = "Pincode must be 6 digits.";
+                        input.style.border = "2px solid red";
+                        isValid = false;
+                    }
+                });
+    
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+
+    <!-- Plugins JS File -->
+    <script src="user/assets/js/jquery.min.js"></script>
+    <script src="user/assets/js/bootstrap.bundle.min.js"></script>
+    <!-- Main JS File -->
+    <script src="user/assets/js/main.js"></script>
+</body>
+</html>

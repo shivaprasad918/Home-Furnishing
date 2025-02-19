@@ -1,0 +1,137 @@
+<%- include('../layouts/header.ejs') -%>
+
+<main class="main">
+    <!-- Adjusted background image to cover the entire body -->
+    <div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17"
+        style="background-image: url('user/assets/images/backgrounds/login-bg.jpg'); height: 100vh;">
+        <div class="container-fluid"> <!-- Use container-fluid to make the container full-width -->
+            <div class="row justify-content-center align-items-center h-100"> <!-- Center content vertically -->
+                <div class="col-md-8 col-lg-6"> <!-- Adjusted box width for medium and large screens -->
+                    <div class="form-box">
+                        <div class="form-tab">
+                            <ul class="nav nav-pills nav-fill" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="verify-tab" data-toggle="tab" href="#verify" role="tab"
+                                        aria-controls="verify" aria-selected="true">OTP Verification</a>
+                                </li>
+                            </ul>
+                            <br>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="verify" role="tabpanel"
+                                    aria-labelledby="verify-tab">
+                                    <!-- OTP verification form -->
+                                    <form action="/verify/<%=locals.email%>" method="POST" id="otp-form">
+                                        <div class="form-group">
+                                           <label for="otp">Enter OTP:</label>
+                                            <!-- Input field for OTP -->
+                                            <input type="text" class="form-control" id="otp" name="otp" maxlength="4" pattern="\d{4}" title="Please enter exactly 4 digits" required autocomplete="off">
+                                            <p class="text-danger"><%= message %></p>
+                                        </div><!-- End .form-group -->
+
+                                        <div id="timer"></div>
+                                        <button type="button" class="btn btn-secondary mt-3" id="resend-otp" style="display: none;">Resend OTP</button>
+
+                                        <!-- Submit button -->
+                                       <button type="submit" class="btn btn-primary" id="otp-submit" >
+                                           Verify OTP
+                                       </button>
+
+                                    </form>
+                                </div><!-- End .tab-pane -->
+                            </div><!-- End .tab-content -->
+                        </div><!-- End .form-tab -->
+                    </div><!-- End .form-box -->
+                </div><!-- End .col-md-8 col-lg-6 -->
+            </div><!-- End .row -->
+        </div><!-- End .container-fluid -->
+    </div><!-- End .login-page section-bg -->
+</main><!-- End .main -->
+
+
+
+<script>
+  
+    function resendOTP() {
+        axios.post('/resend-otp', { email: '<%= locals.email %>' })
+            .then(function (response) {
+                console.log('OTP resent successfully');
+                hideResendButton();
+                // Show the verify OTP button
+                showVerifyButton();
+                // Restart the timer
+                updateTimer();
+            })
+            .catch(function (error) {
+                // Handle error
+                console.error('Error resending OTP:', error);
+            });
+    }
+
+    // Function to update the timer and show resend OTP link when timer expires
+    function updateTimer() {
+        var duration = 60; // Duration of the timer in seconds
+        var display = document.querySelector('#timer');
+        var timerInterval = setInterval(function () {
+            duration--;
+            var minutes = Math.floor(duration / 60);
+            var seconds = duration % 60;
+            // Display timer
+            display.textContent = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+            // When the timer reaches zero
+            if (duration <= 0) {
+                clearInterval(timerInterval);
+                // Show the resend OTP button
+                showResendButton();
+                // Hide the verify OTP button
+                hideVerifyButton();
+            }
+        }, 1000);
+    }
+
+    // Function to show resend OTP button
+    function showResendButton() {
+        var resendButton = document.getElementById('resend-otp');
+        resendButton.style.display = 'inline-block';
+    }
+
+    // Function to hide resend OTP button
+    function hideResendButton() {
+        var resendButton = document.getElementById('resend-otp');
+        resendButton.style.display = 'none';
+    }
+
+    // Function to show verify OTP button
+    function showVerifyButton() {
+        var verifyButton = document.getElementById('otp-submit');
+        verifyButton.style.display = 'inline-block';
+    }
+
+    // Function to hide verify OTP button
+    function hideVerifyButton() {
+        var verifyButton = document.getElementById('otp-submit');
+        verifyButton.style.display = 'none';
+    }
+
+    // Function to initialize the timer when the page loads
+    window.onload = function () {
+        // Show the verify OTP button initially
+        showVerifyButton();
+        // Start the timer
+        updateTimer();
+    };
+
+    // Event listener for Resend OTP button click
+    document.getElementById('resend-otp').addEventListener('click', resendOTP);
+
+</script>
+
+
+
+
+
+
+
+
+
+
+<%- include('../layouts/footer.ejs') -%>
