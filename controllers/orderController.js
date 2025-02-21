@@ -285,9 +285,10 @@ const downloadInvoice = async (req, res) => {
         const browser = await puppeteer.launch({
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
             headless: true,
+            
           });
         const page = await browser.newPage();
-        const invoiceUrl = `https://homefurnishing.fun/getInvoice/${orderId}`;
+        const invoiceUrl = `http://localhost:3005/getInvoice/${orderId}`;
         console.log("invoiceUrl : ",invoiceUrl);
         
         await page.goto(invoiceUrl, { waitUntil: 'networkidle2' });
@@ -297,7 +298,7 @@ const downloadInvoice = async (req, res) => {
 
         res.set({
             'Content-Type': 'application/pdf',
-            'Content-Disposition': 'attachment; filename="hn.pdf"',
+            'Content-Disposition': `attachment; filename="invoice-${orderId}.pdf"`,
         });
         console.log("res.send : ");
         res.send(pdf);
@@ -314,6 +315,9 @@ const getInvoice = async (req, res) => {
         const { orderId } = req.params
         const order = await Order.findById(orderId).populate('User').exec();
 
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
         res.render('invoice', { order })
     } catch (error) {
 

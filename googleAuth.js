@@ -11,7 +11,9 @@ const redirectUri = process.env.REDIRECT_URI;
 
 // Initiates the Google Login flow
 router.get('/auth/google', (req, res) => {
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientID}&redirect_uri=${redirectUri}&response_type=code&scope=profile email`;
+//   const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientID}&redirect_uri=${redirectUri}&response_type=code&scope=profile email`;
+const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientID}&redirect_uri=${redirectUri}&response_type=code&scope=profile email&prompt=select_account`;
+
   res.redirect(url);
 });
 
